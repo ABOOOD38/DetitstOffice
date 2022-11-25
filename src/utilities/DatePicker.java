@@ -1,4 +1,4 @@
-package models.utilities;
+package utilities;
 
 import javax.swing.*;
 import java.awt.*;

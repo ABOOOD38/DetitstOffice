@@ -2,8 +2,8 @@ package controllers;
 
 
 import models.Patient;
-import models.dao.ConcretePatientDao;
-import views.InfoView;
+import database.dao.ConcretePatientDao;
+import views.interfaces.InfoView;
 import org.jetbrains.annotations.Nullable;
 import views.HomeView;
 
@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.List;
 
-import static models.utilities.ValidationMethods.isValidPatient;
+import static utilities.ValidationMethods.isValidPatient;
 
 public class RegisterPatientController {
     private InfoView<Patient> registerPatientView;

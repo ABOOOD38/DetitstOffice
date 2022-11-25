@@ -1,9 +1,9 @@
 package controllers;
 
 import models.Schedule;
-import models.dao.ConcreteDoctorDao;
-import models.dao.ConcreteScheduleDao;
-import views.TableInfoView;
+import database.dao.ConcreteDoctorDao;
+import database.dao.ConcreteScheduleDao;
+import views.interfaces.TableInfoView;
 
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;

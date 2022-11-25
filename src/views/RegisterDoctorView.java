@@ -3,14 +3,15 @@ package views;
 import models.Doctor;
 import models.Employee;
 import models.PersonInfo;
+import views.interfaces.InfoView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import static models.utilities.ValidationMethods.isValidEmailAddress;
-import static models.utilities.ValidationMethods.isValidPhoneNumber;
+import static utilities.ValidationMethods.isValidEmailAddress;
+import static utilities.ValidationMethods.isValidPhoneNumber;
 
 public class RegisterDoctorView extends JFrame implements InfoView<Doctor> {
     private static final int FRAME_WIDTH = 500;

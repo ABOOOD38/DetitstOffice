@@ -1,9 +1,9 @@
 package controllers;
 
-import models.Auth;
+import authentication.Auth;
 import models.Doctor;
-import models.dao.ConcreteDoctorDao;
-import views.InfoView;
+import database.dao.ConcreteDoctorDao;
+import views.interfaces.InfoView;
 import org.jetbrains.annotations.Nullable;
 import views.HomeView;
 

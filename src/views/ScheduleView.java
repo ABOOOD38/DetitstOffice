@@ -1,7 +1,8 @@
 package views;
 
 import models.Schedule;
-import models.utilities.DatePicker;
+import utilities.DatePicker;
+import views.interfaces.TableInfoView;
 
 import javax.swing.*;
 import java.awt.*;

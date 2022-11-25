@@ -1,8 +1,8 @@
 package controllers;
 
-import models.Auth;
+import authentication.Auth;
 import models.Employee;
-import views.InfoView;
+import views.interfaces.InfoView;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.event.ActionListener;

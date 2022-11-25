@@ -1,6 +1,6 @@
 package controllers;
 
-import views.View;
+import views.interfaces.View;
 import views.*;
 
 import java.awt.event.ActionListener;

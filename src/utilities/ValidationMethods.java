@@ -1,7 +1,7 @@
-package models.utilities;
+package utilities;
 
 import models.Patient;
-import models.dao.ConcretePatientDao;
+import database.dao.ConcretePatientDao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

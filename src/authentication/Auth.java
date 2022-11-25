@@ -1,13 +1,14 @@
-package models;
+package authentication;
 
-import models.dao.ConcreteDoctorDao;
-import models.dao.ConcreteEmployeeDao;
-import views.Authentication;
+import database.dao.ConcreteDoctorDao;
+import database.dao.ConcreteEmployeeDao;
+import models.Doctor;
+import models.Employee;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static models.utilities.ValidationMethods.close;
+import static utilities.ValidationMethods.close;
 
 public class Auth implements Authentication {
     private static final Auth INSTANCE = new Auth();

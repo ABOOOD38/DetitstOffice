@@ -1,6 +1,7 @@
 package views;
 
 import models.Employee;
+import views.interfaces.InfoView;
 
 import javax.swing.*;
 import java.awt.*;

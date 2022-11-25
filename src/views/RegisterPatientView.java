@@ -2,6 +2,7 @@ package views;
 
 import models.Patient;
 import models.PersonInfo;
+import views.interfaces.InfoView;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -10,8 +11,8 @@ import java.util.List;
 
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.SOUTH;
-import static models.utilities.ValidationMethods.isValidEmailAddress;
-import static models.utilities.ValidationMethods.isValidPhoneNumber;
+import static utilities.ValidationMethods.isValidEmailAddress;
+import static utilities.ValidationMethods.isValidPhoneNumber;
 
 public class RegisterPatientView extends JFrame implements InfoView<Patient> {
     private static final int FRAME_WIDTH = 500;

@@ -1,4 +1,4 @@
-package views;
+package authentication;
 
 import models.Doctor;
 import models.Employee;

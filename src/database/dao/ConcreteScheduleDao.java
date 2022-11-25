@@ -1,6 +1,6 @@
-package models.dao;
+package database.dao;
 
-import models.Database;
+import database.Database;
 import models.Schedule;
 
 import java.sql.PreparedStatement;
