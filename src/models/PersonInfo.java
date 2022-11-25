@@ -1,10 +1,35 @@
 package models;
 
 public record PersonInfo(String name, String phoneNumber, String email) {
-    private static final String DEFAULT_EMAIL_STRING = "No email";
 
-    public PersonInfo(final String name, final String phoneNumber) {
-        this(name, phoneNumber, DEFAULT_EMAIL_STRING);
+    public static PersonInfoBuilder getBuilder() {
+        return new PersonInfoBuilder();
+    }
+
+    public static class PersonInfoBuilder {
+        private String name;
+        private String phoneNumber;
+        private String email = "No Email";
+
+        public PersonInfoBuilder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public PersonInfoBuilder withPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
+
+        public PersonInfoBuilder withEmail(String email) {
+            if (!email.isEmpty())
+                this.email = email;
+            return this;
+        }
+
+        public PersonInfo build() {
+            return new PersonInfo(name, phoneNumber, email);
+        }
     }
 
     @Override

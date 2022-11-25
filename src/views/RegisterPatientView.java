@@ -1,12 +1,10 @@
 package views;
 
 import models.Patient;
-import models.PersonInfo;
 import views.interfaces.InfoView;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
 import java.util.List;
 
 import static java.awt.BorderLayout.CENTER;
@@ -55,21 +53,7 @@ public class RegisterPatientView extends JFrame implements InfoView<Patient> {
     public void displayMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
-
-    @Override
-    public Patient getInfo() throws IllegalArgumentException {
-        PersonInfo personInfo;
-        try {
-            if (getEmail().isEmpty())
-                personInfo = new PersonInfo(_getName(), getPhoneNumber());
-            else
-                personInfo = new PersonInfo(_getName(), getPhoneNumber(), getEmail());
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException();
-        }
-        return new Patient(personInfo, new BigDecimal(0), new BigDecimal(0), null);
-    }
-
+    
     @Override
     public JFrame getJFrame() {
         return this;
@@ -101,6 +85,15 @@ public class RegisterPatientView extends JFrame implements InfoView<Patient> {
             return email;
         else {
             displayMessage("please enter a valid email address");
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public Patient getInfo() throws IllegalArgumentException {
+        try {
+            return Patient.getBuilder().withName(_getName()).withPhoneNumber(getPhoneNumber()).withEmail(getEmail()).build();
+        } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException();
         }
     }

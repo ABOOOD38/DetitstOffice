@@ -1,8 +1,6 @@
 package views;
 
 import models.Doctor;
-import models.Employee;
-import models.PersonInfo;
 import views.interfaces.InfoView;
 
 import javax.swing.*;
@@ -150,15 +148,11 @@ public class RegisterDoctorView extends JFrame implements InfoView<Doctor> {
 
     @Override
     public Doctor getInfo() throws IllegalArgumentException {
-        PersonInfo personInfo;
-
-        if (getEmail().isEmpty())
-            personInfo = new PersonInfo(_getName(), getPhoneNumber());
-        else
-            personInfo = new PersonInfo(_getName(), getPhoneNumber(), getEmail());
-
         try {
-            return new Doctor(new Employee(getUserName(), getPassword()), personInfo);
+            return Doctor.getBuilder().withUserName(getUserName()).withPassword(getPassword()).
+                    withName(_getName()).withPhoneNumber(getPhoneNumber()).
+                    withEmail(getEmail()).
+                    build();
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException();
         }
