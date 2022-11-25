@@ -21,27 +21,24 @@ public class ConcreteDoctorDao implements DoctorDao {
     }
 
     @Override
-    public boolean insert(Doctor doctor) throws SQLException {
+    public Integer insert(Doctor doctor) throws SQLException {
         String insertDoctorSql = "insert into Doctor (doctor_name, email, phone_number,login_id) VALUES (?,?,?,?)";
 
-        try (ResultSet generatedKeys = ConcreteEmployeeDao.getInstance().insert(doctor.employee())) {
-            if (generatedKeys != null) {
-                try (PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(insertDoctorSql)) {
-                    statement.setString(1, doctor.personInfo().name());
-                    statement.setString(2, doctor.personInfo().email());
-                    statement.setString(3, doctor.personInfo().phoneNumber());
-                    if (generatedKeys.next()) {
-                        statement.setInt(4, generatedKeys.getInt(1));
-                        System.out.println("key");
-                    }
-                    statement.executeUpdate();
-                }
+        Integer key = ConcreteEmployeeDao.getInstance().insert(doctor.employee());
+        try (PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(insertDoctorSql)) {
+            statement.setString(1, doctor.personInfo().name());
+            statement.setString(2, doctor.personInfo().email());
+            statement.setString(3, doctor.personInfo().phoneNumber());
+            if (key != 0) {
+                statement.setInt(4, key);
+                System.out.println(key);
             }
+            statement.executeUpdate();
         } catch (SQLException e) {
             System.err.println("not inserted");
             throw new SQLException();
         }
-        return true;
+        return 0;
     }
 
     @Override
@@ -56,7 +53,17 @@ public class ConcreteDoctorDao implements DoctorDao {
 
     @Override
     public Doctor getById(int id) throws SQLException {
-        return null;
+        String sql = "SELECT doctor_name, email, phone_number, schedule_id, login_id FROM Doctor";
+        try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            return Doctor.getBuilder().withName(resultSet.getString(1)).withEmail(resultSet.getString(2)).
+                    withPhoneNumber(resultSet.getString(3)).withScheduleID(resultSet.getInt(4))
+                    .build();
+        } catch (SQLException e) {
+            System.err.println("getById(int id)\n" + e.getMessage());
+            throw new SQLException();
+        }
     }
 
     @Override
@@ -79,12 +86,23 @@ public class ConcreteDoctorDao implements DoctorDao {
 
     @Override
     public ResultSet getDoctorJoinSchedule() throws SQLException {
-        String sql = "SELECT schedule_id, Doctor.ID, doctor_name, email, phone_number, start_at, due_to FROM Doctor LEFT OUTER JOIN  Schedule ON Doctor.schedule_id = Schedule.ID";
+        String sql = "SELECT Doctor.doctor_id, doctor_name, email, phone_number, schedule_id, start_at, due_to FROM Doctor LEFT OUTER JOIN  Schedule ON Doctor.schedule_id = Schedule.ID";
         try {
             PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql);
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
             System.err.println("getSchedule");
+            throw new SQLException();
+        }
+    }
+
+    @Override
+    public Integer update(Integer id, Integer fk) throws SQLException {
+        String sql = "UPDATE Doctor SET schedule_id = " + fk + " WHERE doctor_id = " + id;
+        try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql)) {
+            return preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("update(Integer id, Integer fk)\n" + e.getMessage());
             throw new SQLException();
         }
     }

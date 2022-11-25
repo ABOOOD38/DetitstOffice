@@ -1,11 +1,11 @@
 package controllers;
 
 import authentication.Auth;
-import models.Doctor;
 import database.dao.ConcreteDoctorDao;
-import views.interfaces.InfoView;
+import models.Doctor;
 import org.jetbrains.annotations.Nullable;
 import views.HomeView;
+import views.interfaces.InfoView;
 
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -44,7 +44,7 @@ public class RegisterDoctorController {
                             break;
 
                         case 2:
-                            if (ConcreteDoctorDao.getInstance().insert(doctor)) {
+                            if (ConcreteDoctorDao.getInstance().insert(doctor) != 0) {
                                 doctorInfoView.displayMessage("registration completed");
                                 clean();
                             } else

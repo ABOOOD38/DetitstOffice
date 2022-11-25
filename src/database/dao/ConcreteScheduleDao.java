@@ -3,25 +3,54 @@ package database.dao;
 import database.Database;
 import models.Schedule;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ConcreteScheduleDao implements Dao<Schedule> {
     private static final ConcreteScheduleDao INSTANCE = new ConcreteScheduleDao();
 
     private ConcreteScheduleDao() {
-
     }
 
     @Override
     public ResultSet getAll() throws SQLException {
-        return null;
+        String sql = "SELECT * FROM Schedule";
+
+        try {
+            PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql);
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            System.err.println("getAll\n" + e.getMessage());
+            throw new SQLException();
+        }
     }
 
     @Override
     public boolean delete(int id) throws SQLException {
-        return false;
+        String sql = "DELETE FROM Schedule WHERE ID = " + id;
+        try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql)) {
+            preparedStatement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("delete(id)\n" + e.getMessage());
+            throw new SQLException();
+        }
+    }
+
+    // 0 if not inserted
+    @Override
+    public Integer insert(Schedule schedule) throws SQLException {
+        String sql = "INSERT INTO Schedule(start_at, due_to) VALUES (?,?)";
+        try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setDate(1, Date.valueOf(schedule.startAt()));
+            preparedStatement.setDate(2, Date.valueOf(schedule.endAt()));
+            preparedStatement.executeUpdate();
+            ResultSet keys = preparedStatement.getGeneratedKeys();
+            if (keys.next()) return keys.getInt(1);
+        } catch (SQLException e) {
+            System.err.println("insert(Schedule)\n" + e.getMessage());
+            throw new SQLException();
+        }
+        return 0;
     }
 
     @Override
@@ -41,8 +70,8 @@ public class ConcreteScheduleDao implements Dao<Schedule> {
             PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql);
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
-            System.err.println("getScheduleRowsNum()");
-            throw new RuntimeException();
+            System.err.println("getScheduleRowsNum()\n" + e.getMessage());
+            throw new SQLException();
         }
     }
 

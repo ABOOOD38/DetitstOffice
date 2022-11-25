@@ -1,10 +1,12 @@
 package utilities;
 
-import models.Patient;
 import database.dao.ConcretePatientDao;
+import models.Patient;
+import models.Schedule;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Period;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +34,11 @@ public class ValidationMethods {
             }
         close(patients);
         return true;
+    }
+
+    public static boolean isValidDate(Schedule schedule) {
+        Period period = Period.between(schedule.startAt(), schedule.endAt());
+        return period.getDays() >= 7;
     }
 
     public static void close(ResultSet resultSet) {

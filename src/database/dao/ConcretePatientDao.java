@@ -6,6 +6,7 @@ import models.Patient;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ConcretePatientDao implements PatientDao {
 
@@ -29,19 +30,22 @@ public class ConcretePatientDao implements PatientDao {
     }
 
     @Override
-    public boolean insert(Patient patient) throws SQLException {
+    public Integer insert(Patient patient) throws SQLException {
         Database database = Database.getInstance();
         String sql = "INSERT INTO Patient(patient_name, email, phone_number, owed_balance, total_payed_balance) VALUES (?,?,?,?,?)";
 
-        try (PreparedStatement preparedStatement = database.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = database.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, patient.personInfo().name());
             preparedStatement.setString(2, patient.personInfo().email());
             preparedStatement.setString(3, patient.personInfo().phoneNumber());
             preparedStatement.setFloat(4, 0.0f);
             preparedStatement.setFloat(5, 0.0f);
             preparedStatement.executeUpdate();
-            return true;
+            ResultSet key = preparedStatement.getGeneratedKeys();
+            if (key.next())
+                return key.getInt(1);
         }
+        return 0;
     }
 
     @Override

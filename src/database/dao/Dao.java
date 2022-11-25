@@ -8,6 +8,8 @@ public interface Dao<T> {
 
     boolean delete(int id) throws SQLException;
 
+    Integer insert(T object) throws SQLException;
+
     boolean update(T object) throws SQLException;
 
     T getById(int id) throws SQLException;

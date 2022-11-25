@@ -28,7 +28,7 @@ public class IndexView extends JFrame implements View {
         backGround.add(buttonsPanel);
         getContentPane().add(backGround, BorderLayout.CENTER);
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pack();
         setVisible(true);
         requestFocus();

@@ -33,7 +33,7 @@ public class RegisterPatientView extends JFrame implements InfoView<Patient> {
         getContentPane().add(CENTER, backGround);
         getContentPane().add(SOUTH, register);
         setTitle("Patient Register");
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         pack();
         requestFocus();
@@ -53,7 +53,7 @@ public class RegisterPatientView extends JFrame implements InfoView<Patient> {
     public void displayMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
-    
+
     @Override
     public JFrame getJFrame() {
         return this;

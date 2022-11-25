@@ -1,28 +1,32 @@
 package views;
 
 import models.Schedule;
+import models.ScheduleTable;
+import org.jetbrains.annotations.Nullable;
 import utilities.DatePicker;
 import views.interfaces.TableInfoView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
-public class ScheduleView extends JFrame implements TableInfoView<Schedule> {
+public class ScheduleView extends JFrame implements TableInfoView<ScheduleTable> {
     private final static int FRAME_WIDTH = 400;
     private final static int FRAME_HEIGHT = 200;
-    private JButton showStart_S;
-    private JButton showEnd_S;
-    private JTextField startDateField_S;
-    private JTextField endDateField_S;
-    private JList<Integer> idList_S;
-    private Integer idVal_S;
+    private JButton showStar;
+    private JButton showEnd;
+    private JTextField startDateField;
+    private JTextField endDateField;
+    private JList<Integer> idList;
+    private int idVal;
 
-    private JButton add_S;
-    private JButton remove_S;
-    private JButton update_S;
-    private JButton clear_S;
+    private JButton add;
+    private JButton remove;
+    private JButton update;
+    private JButton clear;
     private static JTable scheduleTable;
 
     public ScheduleView() {
@@ -48,31 +52,35 @@ public class ScheduleView extends JFrame implements TableInfoView<Schedule> {
 
         //*********************INPUT_FIELDS1*********************************//
         JPanel fields1 = new JPanel(new GridLayout(2, 1));
-        startDateField_S = new JTextField(20);
-        endDateField_S = new JTextField(20);
-        fields1.add(startDateField_S);
-        fields1.add(endDateField_S);
+        startDateField = new JTextField(20);
+        endDateField = new JTextField(20);
+        startDateField.setBackground(Color.WHITE);
+        endDateField.setBackground(Color.WHITE);
+        startDateField.setEditable(false);
+        endDateField.setEditable(false);
+        fields1.add(startDateField);
+        fields1.add(endDateField);
         //*********************INPUT_FIELDS1*********************************//
 
 
         //**********************INPUT_BUTTONS1*******************************//
         JPanel buttons1 = new JPanel(new GridLayout(2, 1));
-        showStart_S = new JButton("popup");
-        showEnd_S = new JButton("popup");
-        buttons1.add(showStart_S);
-        buttons1.add(showEnd_S);
+        showStar = new JButton("popup");
+        showEnd = new JButton("popup");
+        buttons1.add(showStar);
+        buttons1.add(showEnd);
         //**********************INPUT_BUTTONS1*******************************//
 
 
         //**********************INPUT_ID_LIST1*******************************//
-        idList_S = new JList<>();
+        idList = new JList<>();
         DefaultListModel<Integer> listModel = new DefaultListModel<>();
 
-        idList_S.setSelectionMode(JList.VERTICAL);
-        idList_S.setModel(listModel);
-        idList_S.setVisibleRowCount(-1);
+        idList.setSelectionMode(JList.VERTICAL);
+        idList.setModel(listModel);
+        idList.setVisibleRowCount(-1);
         listModel.addAll(List.of(1, 2, 3, 4, 5, 6, 8, 9));
-        JScrollPane idListScroller = new JScrollPane(idList_S);
+        JScrollPane idListScroller = new JScrollPane(idList);
 
         //**********************INPUT_ID_LIST1*******************************//
         JPanel inputs1 = new JPanel(new GridLayout(1, 4));
@@ -83,7 +91,7 @@ public class ScheduleView extends JFrame implements TableInfoView<Schedule> {
         JLabel l = new JLabel("Select ID", SwingConstants.CENTER);
         s.add(l);
         s.add(idListScroller);
-        table1.add(s,BorderLayout.CENTER);
+        table1.add(s, BorderLayout.CENTER);
 
         table1.add(inputs1, BorderLayout.NORTH);
         //*****************************************INPUTS_1***********************************//
@@ -91,20 +99,22 @@ public class ScheduleView extends JFrame implements TableInfoView<Schedule> {
 
         //****************SCHEDULE_TABLE***************//
         scheduleTable.setDefaultEditor(Object.class, null);
+        scheduleTable.setCellSelectionEnabled(true);
+
         table1.add(new JScrollPane(scheduleTable), BorderLayout.CENTER);
         //****************SCHEDULE_TABLE***************//
 
 
         //***************BUTTONS1***********************//
         JPanel buttons_S = new JPanel(new GridLayout(1, 4));
-        add_S = new JButton("Add");
-        remove_S = new JButton("Remove");
-        update_S = new JButton("Update");
-        clear_S = new JButton("Clear");
-        buttons_S.add(add_S);
-        buttons_S.add(remove_S);
-        buttons_S.add(update_S);
-        buttons_S.add(clear_S);
+        add = new JButton("Add");
+        remove = new JButton("Remove");
+        update = new JButton("Update");
+        clear = new JButton("Clear");
+        buttons_S.add(add);
+        buttons_S.add(remove);
+        buttons_S.add(update);
+        buttons_S.add(clear);
         table1.add(buttons_S, BorderLayout.SOUTH);
         //***************BUTTONS1***********************//
 
@@ -120,7 +130,7 @@ public class ScheduleView extends JFrame implements TableInfoView<Schedule> {
 
 
     @Override
-    public Schedule getInfo() {
+    public ScheduleTable getInfo() {
         return null;
     }
 
@@ -129,41 +139,52 @@ public class ScheduleView extends JFrame implements TableInfoView<Schedule> {
         showStartListener();
         showEndListener();
         idListListener();
-        clear_SListener();
+        clearListener();
+        scheduleSelectionListener();
 
-        add_SListener(listeners.get(0));
-        remove_SListener(listeners.get(1));
-        update_SListener(listeners.get(2));
+        addListener(listeners.get(0));
+        removeListener(listeners.get(1));
+        updateListener(listeners.get(2));
     }
 
     private void showStartListener() {
-        showStart_S.addActionListener(ae -> startDateField_S.setText(new DatePicker(this).setPickedDate()));
+        showStar.addActionListener(ae -> startDateField.setText(new DatePicker(this).setPickedDate()));
     }
 
     private void showEndListener() {
-        showEnd_S.addActionListener(ae -> endDateField_S.setText(new DatePicker(this).setPickedDate()));
+        showEnd.addActionListener(ae -> endDateField.setText(new DatePicker(this).setPickedDate()));
     }
 
     private void idListListener() {
-        idList_S.getSelectionModel().addListSelectionListener(ac -> idVal_S = idList_S.getSelectedValue());
+        idList.getSelectionModel().addListSelectionListener(ac -> idVal = idList.getSelectedValue());
     }
 
-    private void add_SListener(ActionListener actionListener) {
-        add_S.addActionListener(actionListener);
+    private void addListener(ActionListener actionListener) {
+        add.addActionListener(actionListener);
     }
 
-    private void remove_SListener(ActionListener actionListener) {
-        remove_S.addActionListener(actionListener);
+    private void removeListener(ActionListener actionListener) {
+        remove.addActionListener(actionListener);
     }
 
-    private void update_SListener(ActionListener actionListener) {
-        update_S.addActionListener(actionListener);
+    private void updateListener(ActionListener actionListener) {
+        update.addActionListener(actionListener);
     }
 
-    private void clear_SListener() {
-        clear_S.addActionListener(actionEvent -> {
-            startDateField_S.setText("");
-            endDateField_S.setText("");
+    private void clearListener() {
+        clear.addActionListener(actionEvent -> {
+            startDateField.setText("");
+            endDateField.setText("");
+        });
+    }
+
+    private void scheduleSelectionListener() {
+        ListSelectionModel selection = getTableSelectionModel();
+        selection.addListSelectionListener(listSelectionEvent -> {
+            int column = 0;
+            int row = scheduleTable.getSelectedRow();
+            idVal = Integer.parseInt(scheduleTable.getModel().getValueAt(row, column).toString());
+            System.err.println(idVal);
         });
     }
 
@@ -172,14 +193,32 @@ public class ScheduleView extends JFrame implements TableInfoView<Schedule> {
         JOptionPane.showMessageDialog(this, msg);
     }
 
+    private ListSelectionModel getTableSelectionModel() {
+        ListSelectionModel selectionModel = scheduleTable.getSelectionModel();
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        return selectionModel;
+    }
+
     @Override
     public JFrame getJFrame() {
         return this;
     }
 
     @Override
-    public void setInfo(Schedule info) {
+    public void setInfo(ScheduleTable info) {
         scheduleTable = new JTable(info.rows(), info.cols());
 
+    }
+
+    @Override
+    public @Nullable Schedule getSelectedSchedule() {
+        try {
+            final LocalDate start = LocalDate.parse(startDateField.getText());
+            final LocalDate end = LocalDate.parse(endDateField.getText());
+            return new Schedule(idVal, start, end);
+        } catch (DateTimeParseException e) {
+            displayMessage("please choose start and end date");
+            return null;
+        }
     }
 }

@@ -30,22 +30,22 @@ public class ConcreteEmployeeDao implements EmployeeDao {
     }
 
     @Override
-    public ResultSet insert(Employee employee) throws SQLException {
+    public Integer insert(Employee employee) throws SQLException {
         String loginSql = "insert into Login (user_name, password, role_id) VALUES (?,?,?)";
-        ResultSet generatedKeys;
-
         try {
             PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(loginSql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, employee.userName());
             statement.setString(2, employee.password());
             statement.setInt(3, 2);
             statement.executeUpdate();
-            generatedKeys = statement.getGeneratedKeys();
+            ResultSet key = statement.getGeneratedKeys();
+            if (key.next())
+                return key.getInt(1);
         } catch (SQLException e) {
             System.err.println("Creating user failed, no ID obtained.");
             throw new SQLException();
         }
-        return generatedKeys;
+        return 0;
     }
 
     @Override
