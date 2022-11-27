@@ -1,6 +1,7 @@
 package database.dao;
 
-import models.ScheduleTable;
+import models.Schedule;
 
-public interface ScheduleDao extends Dao<ScheduleTable>{
+public interface ScheduleDao extends Dao<Schedule> {
+
 }

@@ -6,8 +6,11 @@ import models.Doctor;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 
-public class ConcreteDoctorDao implements DoctorDao {
+public class ConcreteDoctorDao implements DoctorDao<Doctor> {
 
     private final static ConcreteDoctorDao INSTANCE = new ConcreteDoctorDao();
 
@@ -16,7 +19,7 @@ public class ConcreteDoctorDao implements DoctorDao {
     }
 
     @Override
-    public ResultSet getAll() throws SQLException {
+    public Collection<Doctor> getAll() throws SQLException {
         return null;
     }
 
@@ -24,11 +27,11 @@ public class ConcreteDoctorDao implements DoctorDao {
     public Integer insert(Doctor doctor) throws SQLException {
         String insertDoctorSql = "insert into Doctor (doctor_name, email, phone_number,login_id) VALUES (?,?,?,?)";
 
-        Integer key = ConcreteEmployeeDao.getInstance().insert(doctor.employee());
+        Integer key = ConcreteEmployeeDao.getInstance().insert(doctor.employeeInfo());
         try (PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(insertDoctorSql)) {
-            statement.setString(1, doctor.personInfo().name());
-            statement.setString(2, doctor.personInfo().email());
-            statement.setString(3, doctor.personInfo().phoneNumber());
+            statement.setString(1, doctor.personalInfo().name());
+            statement.setString(2, doctor.personalInfo().email());
+            statement.setString(3, doctor.personalInfo().phoneNumber());
             if (key != 0) {
                 statement.setInt(4, key);
                 System.out.println(key);
@@ -42,23 +45,26 @@ public class ConcreteDoctorDao implements DoctorDao {
     }
 
     @Override
-    public boolean delete(int id) throws SQLException {
-        return false;
+    public Integer delete(int id) throws SQLException {
+        return 0;
     }
 
     @Override
-    public boolean update(Doctor object) throws SQLException {
-        return false;
+    public Integer update(Doctor object) throws SQLException {
+        return 0;
     }
 
     @Override
     public Doctor getById(int id) throws SQLException {
-        String sql = "SELECT doctor_name, email, phone_number, schedule_id, login_id FROM Doctor";
+        String sql = "SELECT doctor_name, email, phone_number, schedule_id, login_id FROM Doctor WHERE doctor_id =" + id;
         try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
-            return Doctor.getBuilder().withName(resultSet.getString(1)).withEmail(resultSet.getString(2)).
-                    withPhoneNumber(resultSet.getString(3)).withScheduleID(resultSet.getInt(4))
+            return Doctor.getBuilder().
+                    withName(resultSet.getString("doctor_name")).
+                    withEmail(resultSet.getString("email")).
+                    withPhoneNumber(resultSet.getString("phone_number")).
+                    withScheduleID(resultSet.getInt("schedule_id"))
                     .build();
         } catch (SQLException e) {
             System.err.println("getById(int id)\n" + e.getMessage());
@@ -67,17 +73,26 @@ public class ConcreteDoctorDao implements DoctorDao {
     }
 
     @Override
-    public ResultSet getRowCount() throws SQLException {
+    public Integer getRowCount() throws SQLException {
         return null;
     }
 
     @Override
-    public ResultSet getDoctorJoinLogin() throws SQLException {
+    public Collection<Doctor> getDoctorJoinLogin() throws SQLException {
         String sql = "select doctor_name, email, phone_number, user_name, password FROM Doctor INNER JOIN Login ON Doctor.login_id = Login.ID";
+        Collection<Doctor> doctors = new ArrayList<>();
 
-        try {
-            PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(sql);
-            return statement.executeQuery();
+        try (PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(sql)) {
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                Doctor doctor = Doctor.getBuilder().withName(result.getString("doctor_name")).withEmail(result.getString("email")).
+                        withPhoneNumber(result.getString("phone_number")).withUserName(result.getString("user_name")).
+                        withPassword(result.getString("password")).
+                        build();
+
+                doctors.add(doctor);
+            }
+            return doctors;
         } catch (SQLException e) {
             System.err.println("Error happened ConcreteDoctorDao getDoctorJoinLogin()");
             throw new SQLException();
@@ -85,11 +100,27 @@ public class ConcreteDoctorDao implements DoctorDao {
     }
 
     @Override
-    public ResultSet getDoctorJoinSchedule() throws SQLException {
+    public Collection<Doctor> getDoctorJoinSchedule() throws SQLException {
         String sql = "SELECT Doctor.doctor_id, doctor_name, email, phone_number, schedule_id, start_at, due_to FROM Doctor LEFT OUTER JOIN  Schedule ON Doctor.schedule_id = Schedule.ID";
-        try {
-            PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql);
-            return preparedStatement.executeQuery();
+
+        Collection<Doctor> doctors = new ArrayList<>();
+        try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql)) {
+            ResultSet result = preparedStatement.executeQuery();
+
+            while (result.next()) {
+                Doctor doctor = Doctor.getBuilder().
+                        withID(result.getInt("doctor_id")).
+                        withName(result.getString("doctor_name")).
+                        withEmail(result.getString("email")).
+                        withPhoneNumber(result.getString("phone_number")).
+                        withScheduleID(result.getInt("schedule_id")).
+                        withStartAt(LocalDate.parse(result.getDate("start_at").toString())).
+                        withEndAt(LocalDate.parse(result.getDate("due_to").toString())).
+                        build();
+
+                doctors.add(doctor);
+            }
+            return doctors;
         } catch (SQLException e) {
             System.err.println("getSchedule");
             throw new SQLException();

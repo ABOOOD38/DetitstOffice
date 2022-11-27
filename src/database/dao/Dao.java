@@ -2,17 +2,18 @@ package database.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 
 public interface Dao<T> {
-    ResultSet getAll() throws SQLException;
+    Collection<T> getAll() throws SQLException;
 
-    boolean delete(int id) throws SQLException;
+    Integer delete(int id) throws SQLException;
 
     Integer insert(T object) throws SQLException;
 
-    boolean update(T object) throws SQLException;
+    Integer update(T object) throws SQLException;
 
     T getById(int id) throws SQLException;
 
-    ResultSet getRowCount() throws SQLException;
+    Integer getRowCount() throws SQLException;
 }

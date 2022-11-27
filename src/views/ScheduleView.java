@@ -1,19 +1,20 @@
 package views;
 
 import models.Schedule;
-import models.ScheduleTable;
+import models.TableView;
 import org.jetbrains.annotations.Nullable;
 import utilities.DatePicker;
 import views.interfaces.TableInfoView;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-public class ScheduleView extends JFrame implements TableInfoView<ScheduleTable> {
+public class ScheduleView extends JFrame implements TableInfoView<TableView> {
     private final static int FRAME_WIDTH = 400;
     private final static int FRAME_HEIGHT = 200;
     private JButton showStar;
@@ -100,7 +101,6 @@ public class ScheduleView extends JFrame implements TableInfoView<ScheduleTable>
         //****************SCHEDULE_TABLE***************//
         scheduleTable.setDefaultEditor(Object.class, null);
         scheduleTable.setCellSelectionEnabled(true);
-
         table1.add(new JScrollPane(scheduleTable), BorderLayout.CENTER);
         //****************SCHEDULE_TABLE***************//
 
@@ -130,7 +130,7 @@ public class ScheduleView extends JFrame implements TableInfoView<ScheduleTable>
 
 
     @Override
-    public ScheduleTable getInfo() {
+    public TableView getInfo() {
         return null;
     }
 
@@ -183,8 +183,10 @@ public class ScheduleView extends JFrame implements TableInfoView<ScheduleTable>
         selection.addListSelectionListener(listSelectionEvent -> {
             int column = 0;
             int row = scheduleTable.getSelectedRow();
-            idVal = Integer.parseInt(scheduleTable.getModel().getValueAt(row, column).toString());
-            System.err.println(idVal);
+            if (row != -1) {
+                idVal = Integer.parseInt(scheduleTable.getModel().getValueAt(row, column).toString());
+                System.err.println(idVal);
+            }
         });
     }
 
@@ -205,9 +207,18 @@ public class ScheduleView extends JFrame implements TableInfoView<ScheduleTable>
     }
 
     @Override
-    public void setInfo(ScheduleTable info) {
-        scheduleTable = new JTable(info.rows(), info.cols());
-
+    public void setInfo(TableView info) {
+        if (scheduleTable != null) {
+            DefaultTableModel tableModel = (DefaultTableModel) scheduleTable.getModel();
+            tableModel.setColumnCount(0);
+            tableModel.setDataVector(info.rows(), info.cols());
+            scheduleTable.setModel(tableModel);
+            tableModel.fireTableDataChanged();
+        } else
+            scheduleTable = new JTable();
+        DefaultTableModel tableModel = new DefaultTableModel();
+        tableModel.setDataVector(info.rows(), info.cols());
+        scheduleTable.setModel(tableModel);
     }
 
     @Override
@@ -220,5 +231,15 @@ public class ScheduleView extends JFrame implements TableInfoView<ScheduleTable>
             displayMessage("please choose start and end date");
             return null;
         }
+    }
+
+    @Override
+    public Integer getSelectedID() {
+        return idVal;
+    }
+
+    @Override
+    public void resetScheduleID() {
+        this.idVal = 0;
     }
 }

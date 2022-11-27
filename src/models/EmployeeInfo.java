@@ -1,6 +1,6 @@
 package models;
 
-public record Employee(String userName, String password) {
+public record EmployeeInfo(String userName, String password, Integer roleID) {
 
     public static EmployeeBuilder getBuilder() {
         return new EmployeeBuilder();
@@ -9,6 +9,7 @@ public record Employee(String userName, String password) {
     public static class EmployeeBuilder {
         private String userName;
         private String password;
+        private Integer roleID;
 
 
         public EmployeeBuilder withUserName(String userName) {
@@ -21,8 +22,13 @@ public record Employee(String userName, String password) {
             return this;
         }
 
-        public Employee build() {
-            return new Employee(userName, password);
+        public EmployeeBuilder withRoleID(Integer roleID) {
+            this.roleID = roleID;
+            return this;
+        }
+
+        public EmployeeInfo build() {
+            return new EmployeeInfo(userName, password, roleID);
         }
     }
 
@@ -36,10 +42,15 @@ public record Employee(String userName, String password) {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || obj.getClass() != Employee.class)
+        if (obj == null || obj.getClass() != EmployeeInfo.class)
             return false;
 
-        Employee other = (Employee) obj;
+        EmployeeInfo other = (EmployeeInfo) obj;
         return this.userName.equals(other.userName) && this.password.equals(other.password);
+    }
+
+    public boolean equalsUserName(Object obj) {
+        EmployeeInfo other = (EmployeeInfo) obj;
+        return this.userName.equals(other.userName);
     }
 }

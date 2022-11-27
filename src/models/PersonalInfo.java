@@ -1,6 +1,6 @@
 package models;
 
-public record PersonInfo(String name, String phoneNumber, String email) {
+public record PersonalInfo(String name, String phoneNumber, String email) {
 
     public static PersonInfoBuilder getBuilder() {
         return new PersonInfoBuilder();
@@ -27,18 +27,28 @@ public record PersonInfo(String name, String phoneNumber, String email) {
             return this;
         }
 
-        public PersonInfo build() {
-            return new PersonInfo(name, phoneNumber, email);
+        public PersonalInfo build() {
+            return new PersonalInfo(name, phoneNumber, email);
         }
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || obj.getClass() != PersonInfo.class)
+        if (obj == null || obj.getClass() != PersonalInfo.class)
             return false;
 
-        PersonInfo other = (PersonInfo) obj;
+        PersonalInfo other = (PersonalInfo) obj;
         return this.name.equals(other.name) && this.email.equals(other.email) && this.phoneNumber.equals(other.phoneNumber);
+    }
+
+    public boolean equalsEmailOrPhoneNum(Object obj) {
+        PersonalInfo other = (PersonalInfo) obj;
+        return email.equals(other.email) || phoneNumber.equals(other.phoneNumber);
+    }
+
+    public boolean equalsNameAndPhoneNum(Object obj) {
+        PersonalInfo other = (PersonalInfo) obj;
+        return name.equalsIgnoreCase(other.name) && phoneNumber.equals(other.phoneNumber);
     }
 
     @Override

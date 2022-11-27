@@ -4,9 +4,9 @@ import database.dao.ConcretePatientDao;
 import models.Patient;
 import models.Schedule;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Period;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,15 +24,12 @@ public class ValidationMethods {
     }
 
     public static boolean isValidPatient(Patient patient) throws SQLException {
-        ConcretePatientDao patientDao = ConcretePatientDao.getInstance();
-        ResultSet patients = patientDao.getAll();
-        while (patients.next())
-            if (patient.personInfo().name().equalsIgnoreCase(patients.getString("patient_name")) &&
-                    patient.personInfo().phoneNumber().equals(patients.getString("phone_number"))) {
-                close(patients);
+
+        Collection<Patient> patients = ConcretePatientDao.getInstance().getAll();
+        for (Patient _patient : patients)
+            if (patient.personalInfo().equalsNameAndPhoneNum(_patient.personalInfo())) {
                 return false;
             }
-        close(patients);
         return true;
     }
 
@@ -41,11 +38,4 @@ public class ValidationMethods {
         return period.getDays() >= 7;
     }
 
-    public static void close(ResultSet resultSet) {
-        try {
-            resultSet.close();
-        } catch (SQLException e) {
-            System.err.println("error in validation method close()");
-        }
-    }
 }

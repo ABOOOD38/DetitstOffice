@@ -1,7 +1,7 @@
 package controllers;
 
 import authentication.Auth;
-import models.Employee;
+import models.EmployeeInfo;
 import views.interfaces.InfoView;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,9 +10,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class SignInController {
-    private InfoView<Employee> signInView;
+    private InfoView<EmployeeInfo> signInView;
 
-    public SignInController(InfoView<Employee> signInView) {
+    public SignInController(InfoView<EmployeeInfo> signInView) {
         this.signInView = signInView;
 
         signInView.display();
@@ -25,7 +25,7 @@ public class SignInController {
 
     private ActionListener singInBtnListener() {
         return actionEvent -> {
-            Employee employeeInfo = getEmployeeInfo();
+            EmployeeInfo employeeInfo = getEmployeeInfo();
 
             if (employeeInfo != null) {
                 try {
@@ -48,8 +48,8 @@ public class SignInController {
         };
     }
 
-    private @Nullable Employee getEmployeeInfo() {
-        Employee employeeInfo = null;
+    private @Nullable EmployeeInfo getEmployeeInfo() {
+        EmployeeInfo employeeInfo = null;
         try {
             employeeInfo = signInView.getInfo();
         } catch (IllegalArgumentException e) {

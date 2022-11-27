@@ -1,15 +1,13 @@
 package database.dao;
 
-import models.Doctor;
-
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 
-public interface DoctorDao extends Dao<Doctor> {
+public interface DoctorDao<T> extends Dao<T> {
 
-    ResultSet getDoctorJoinLogin() throws SQLException;
+    Collection<T> getDoctorJoinLogin() throws SQLException;
 
-    ResultSet getDoctorJoinSchedule() throws SQLException;
+    Collection<T> getDoctorJoinSchedule() throws SQLException;
 
     Integer update(Integer id, Integer fk) throws SQLException;
 

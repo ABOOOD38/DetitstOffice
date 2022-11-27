@@ -3,7 +3,7 @@ package models;
 import java.math.BigDecimal;
 import java.util.List;
 
-public record Patient(PersonInfo personInfo, BigDecimal owedBalance, BigDecimal payedBalance, List<Visit> visits) {
+public record Patient(PersonalInfo personalInfo, BigDecimal owedBalance, BigDecimal payedBalance, List<Visit> visits) {
 
     public static PatientBuilder getBuilder() {
         return new PatientBuilder();
@@ -13,8 +13,7 @@ public record Patient(PersonInfo personInfo, BigDecimal owedBalance, BigDecimal 
         private BigDecimal owedBalance = new BigDecimal(0);
         private BigDecimal payedBalance = new BigDecimal(0);
         private List<Visit> visits;
-
-        private final PersonInfo.PersonInfoBuilder personInfoBuilder = PersonInfo.getBuilder();
+        private final PersonalInfo.PersonInfoBuilder personInfoBuilder = PersonalInfo.getBuilder();
 
         public PatientBuilder withName(String name) {
             personInfoBuilder.withName(name);
@@ -53,7 +52,7 @@ public record Patient(PersonInfo personInfo, BigDecimal owedBalance, BigDecimal 
 
     @Override
     public String toString() {
-        return personInfo.toString() + "\n" +
+        return personalInfo.toString() + "\n" +
                 "Patient{" +
                 "owedBalance=" + owedBalance +
                 ", payedBalance=" + payedBalance +

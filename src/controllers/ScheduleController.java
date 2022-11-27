@@ -2,23 +2,22 @@ package controllers;
 
 import database.dao.ConcreteDoctorDao;
 import database.dao.ConcreteScheduleDao;
+import database.dao.DoctorScheduleTableInfo;
 import models.Schedule;
-import models.ScheduleTable;
+import models.TableView;
 import org.jetbrains.annotations.Nullable;
 import views.interfaces.TableInfoView;
 
 import java.awt.event.ActionListener;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
 import static utilities.ValidationMethods.isValidDate;
 
 public class ScheduleController {
-    private final TableInfoView<ScheduleTable> scheduleView;
+    private final TableInfoView<TableView> scheduleView;
 
-    public ScheduleController(TableInfoView<ScheduleTable> scheduleView) {
+    public ScheduleController(TableInfoView<TableView> scheduleView) {
         this.scheduleView = scheduleView;
 
         setScheduleTable();
@@ -27,16 +26,19 @@ public class ScheduleController {
     }
 
     private List<ActionListener> listeners() {
-        return List.of(add_SListener(), remove_SListener(), update_SListener());
+        return List.of(addListener(), removeListener(), updateListener());
     }
 
-    private ActionListener add_SListener() {
+    private ActionListener addListener() {
         return actionEvent -> {
             Schedule schedule = getSelectedSchedule();
-            if (schedule != null) {
+            if (schedule != null && schedule.id() != 0) {
                 try {
                     int fk = ConcreteScheduleDao.getInstance().insert(schedule);
                     ConcreteDoctorDao.getInstance().update(schedule.id(), fk);
+                    scheduleView.displayMessage("added successfully");
+                    scheduleView.resetScheduleID();
+                    setScheduleTable();
                 } catch (SQLException e) {
                     System.err.println(e.getMessage());
                 }
@@ -44,22 +46,28 @@ public class ScheduleController {
         };
     }
 
-    private ActionListener remove_SListener() {
+    private ActionListener removeListener() {
         return actionEvent -> {
-            Schedule schedule = getSelectedSchedule();
-            if (schedule != null) {
+            Integer scheduleID = scheduleView.getSelectedID();
+            if (scheduleID != 0) {
                 try {
-                    int fk = ConcreteDoctorDao.getInstance().getById(schedule.id()).schedule().id();
-                    System.err.println(ConcreteScheduleDao.getInstance().delete(fk));
+                    int fk = ConcreteDoctorDao.getInstance().getById(scheduleID).schedule().id();
+                    int ffk = ConcreteScheduleDao.getInstance().delete(fk);
+                    if (ffk != 0) {
+                        scheduleView.displayMessage("removed successfully");
+                        setScheduleTable();
+                    } else
+                        scheduleView.displayMessage("please choose non empty start and end date");
+
+                    scheduleView.resetScheduleID();
                 } catch (SQLException e) {
                     System.err.println(e.getMessage());
                 }
             }
-
         };
     }
 
-    private ActionListener update_SListener() {
+    private ActionListener updateListener() {
         return actionEvent -> {
             System.out.println("Update");
         };
@@ -75,72 +83,15 @@ public class ScheduleController {
                     scheduleView.displayMessage("Must be at lest one week between start_date and end_date ");
             else
                 scheduleView.displayMessage("Please select doctor_id from the table");
-        return schedule;
+        return null;
     }
 
     private void setScheduleTable() {
         try {
-            ResultSet scheduleSet = ConcreteDoctorDao.getInstance().getDoctorJoinSchedule();
-
-            String[] colsName = getScheduleColNames(scheduleSet);
-            int rowCount = getScheduleRowsCount();
-            int colCount = getScheduleColsNum(scheduleSet);
-
-            System.out.println(rowCount + " " + colCount);
-            String[][] rows = new String[rowCount][colCount];
-
-            int row = 0;
-            while (scheduleSet.next()) {
-                for (int col = 0; col < colCount; ++col) {
-                    Object info = scheduleSet.getObject(col + 1);
-                    if (info != null)
-                        rows[row][col] = info.toString();
-                    else
-                        rows[row][col] = "Empty";
-                }
-                ++row;
-            }
-            scheduleView.setInfo(new ScheduleTable(colsName, rows));
-
-        } catch (SQLException ex) {
-            scheduleView.displayMessage("Error happened please try again");
-            System.err.println("Error in setSchedule()");
-            System.err.println(ex.getMessage());
-        }
-    }
-
-    private String[] getScheduleColNames(ResultSet scheduleSet) throws SQLException {
-        try {
-            ResultSetMetaData resultSetMetaData = scheduleSet.getMetaData();
-            String[] cols = new String[resultSetMetaData.getColumnCount()];
-            for (int i = 0; i < cols.length; ++i) {
-                cols[i] = resultSetMetaData.getColumnName(i + 1);
-            }
-            return cols;
+            scheduleView.setInfo(new DoctorScheduleTableInfo().getTableValues());
         } catch (SQLException e) {
-            System.err.println("error in getScheduleColNames(ResultSet scheduleSet)");
-            throw new SQLException();
-        }
-    }
-
-    private int getScheduleColsNum(ResultSet scheduleSet) throws SQLException {
-        try {
-            ResultSetMetaData resultSetMetaData = scheduleSet.getMetaData();
-            return resultSetMetaData.getColumnCount();
-        } catch (SQLException e) {
-            System.err.println("Error in getScheduleColsNum(ResultSet scheduleSet)");
-            throw new SQLException();
-        }
-    }
-
-    private int getScheduleRowsCount() throws SQLException {
-        try {
-            ResultSet resultSet = ConcreteScheduleDao.getInstance().getRowCount();
-            resultSet.next();
-            return resultSet.getInt(1);
-        } catch (SQLException e) {
-            System.err.println("Error in getScheduleRowsCount()");
-            throw new SQLException();
+            scheduleView.displayMessage("Error happened");
+            System.err.println(e.getMessage());
         }
     }
 }

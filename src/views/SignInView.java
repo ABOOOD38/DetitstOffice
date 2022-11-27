@@ -1,6 +1,6 @@
 package views;
 
-import models.Employee;
+import models.EmployeeInfo;
 import views.interfaces.InfoView;
 
 import javax.swing.*;
@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class SignInView extends JFrame implements InfoView<Employee> {
+public class SignInView extends JFrame implements InfoView<EmployeeInfo> {
     private JTextField userNameTextFiled;
     private JPasswordField passwordTextFiled;
     private JButton signIn;
@@ -86,7 +86,10 @@ public class SignInView extends JFrame implements InfoView<Employee> {
     }
 
     @Override
-    public Employee getInfo() {
-        return new Employee(getUserName(), getPassword());
+    public EmployeeInfo getInfo() {
+        return EmployeeInfo.getBuilder().
+                withUserName(getUserName()).
+                withPassword(getPassword()).
+                build();
     }
 }

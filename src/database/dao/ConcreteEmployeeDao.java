@@ -1,14 +1,16 @@
 package database.dao;
 
 import database.Database;
-import models.Employee;
+import models.EmployeeInfo;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
 
-public class ConcreteEmployeeDao implements EmployeeDao {
+public class ConcreteEmployeeDao implements Dao<EmployeeInfo> {
 
     private static final ConcreteEmployeeDao INSTANCE = new ConcreteEmployeeDao();
 
@@ -17,12 +19,23 @@ public class ConcreteEmployeeDao implements EmployeeDao {
     }
 
     @Override
-    public ResultSet getAll() throws SQLException {
-        String sql = "select user_name, password, role_id from Login";
+    public Collection<EmployeeInfo> getAll() throws SQLException {
+        String sql = "SELECT user_name, password, role_id FROM Login";
 
-        try {
-            PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(sql);
-            return statement.executeQuery();
+        Collection<EmployeeInfo> employeeInfos = new ArrayList<>();
+
+        try (PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(sql)) {
+            ResultSet result = statement.executeQuery();
+
+            while (result.next()) {
+                EmployeeInfo empInfo = EmployeeInfo.getBuilder().
+                        withUserName(result.getString("user_name")).
+                        withPassword(result.getString("password")).
+                        withRoleID(result.getInt("role_id")).
+                        build();
+                employeeInfos.add(empInfo);
+            }
+            return employeeInfos;
         } catch (SQLException e) {
             System.err.println("Error happened getLoginsInfo()");
             throw new SQLException();
@@ -30,12 +43,12 @@ public class ConcreteEmployeeDao implements EmployeeDao {
     }
 
     @Override
-    public Integer insert(Employee employee) throws SQLException {
+    public Integer insert(EmployeeInfo employeeInfo) throws SQLException {
         String loginSql = "insert into Login (user_name, password, role_id) VALUES (?,?,?)";
         try {
             PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(loginSql, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, employee.userName());
-            statement.setString(2, employee.password());
+            statement.setString(1, employeeInfo.userName());
+            statement.setString(2, employeeInfo.password());
             statement.setInt(3, 2);
             statement.executeUpdate();
             ResultSet key = statement.getGeneratedKeys();
@@ -49,22 +62,22 @@ public class ConcreteEmployeeDao implements EmployeeDao {
     }
 
     @Override
-    public boolean delete(int id) throws SQLException {
-        return false;
+    public Integer delete(int id) throws SQLException {
+        return 0;
     }
 
     @Override
-    public boolean update(Employee object) throws SQLException {
-        return false;
+    public Integer update(EmployeeInfo object) throws SQLException {
+        return 0;
     }
 
     @Override
-    public Employee getById(int id) throws SQLException {
+    public EmployeeInfo getById(int id) throws SQLException {
         return null;
     }
 
     @Override
-    public ResultSet getRowCount() throws SQLException {
+    public Integer getRowCount() throws SQLException {
         return null;
     }
 

@@ -4,7 +4,6 @@ import authentication.Auth;
 import database.dao.ConcreteDoctorDao;
 import models.Doctor;
 import org.jetbrains.annotations.Nullable;
-import views.HomeView;
 import views.interfaces.InfoView;
 
 import java.awt.event.ActionListener;
@@ -39,7 +38,7 @@ public class RegisterDoctorController {
                             doctorInfoView.displayMessage("choose another username");
                             break;
 
-                        case 3:
+                        case -1:
                             doctorInfoView.displayMessage("Error Happened");
                             break;
 
@@ -72,7 +71,6 @@ public class RegisterDoctorController {
     private void clean() {
         doctorInfoView.getJFrame().dispose();
         doctorInfoView = null;
-        HomeView.getInstance().getJFrame().setVisible(true);
 
     }
 }

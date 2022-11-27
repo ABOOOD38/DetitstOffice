@@ -4,20 +4,34 @@ import database.Database;
 import models.Schedule;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 
-public class ConcreteScheduleDao implements Dao<Schedule> {
+public class ConcreteScheduleDao implements ScheduleDao {
     private static final ConcreteScheduleDao INSTANCE = new ConcreteScheduleDao();
 
     private ConcreteScheduleDao() {
     }
 
     @Override
-    public ResultSet getAll() throws SQLException {
-        String sql = "SELECT * FROM Schedule";
+    public Collection<Schedule> getAll() throws SQLException {
+        String sql = "SELECT ID, start_at, due_to FROM Schedule";
 
-        try {
-            PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql);
-            return preparedStatement.executeQuery();
+        Collection<Schedule> schedules = new ArrayList<>();
+
+        try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql)) {
+            ResultSet result = preparedStatement.executeQuery();
+
+            while (result.next()) {
+                Schedule schedule = Schedule.getBuilder().
+                        withID(result.getInt("ID")).
+                        withStartAt(LocalDate.parse(result.getDate("start_at").toString())).
+                        withEndAt(LocalDate.parse(result.getDate("due_to").toString())).
+                        build();
+                schedules.add(schedule);
+            }
+            return schedules;
         } catch (SQLException e) {
             System.err.println("getAll\n" + e.getMessage());
             throw new SQLException();
@@ -25,11 +39,10 @@ public class ConcreteScheduleDao implements Dao<Schedule> {
     }
 
     @Override
-    public boolean delete(int id) throws SQLException {
-        String sql = "DELETE FROM Schedule WHERE ID = " + id;
+    public Integer delete(int id) throws SQLException {
+        String sql = "DELETE FROM Schedule WHERE ID =" + id;
         try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql)) {
-            preparedStatement.executeUpdate();
-            return true;
+            return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.err.println("delete(id)\n" + e.getMessage());
             throw new SQLException();
@@ -54,8 +67,8 @@ public class ConcreteScheduleDao implements Dao<Schedule> {
     }
 
     @Override
-    public boolean update(Schedule object) throws SQLException {
-        return false;
+    public Integer update(Schedule object) throws SQLException {
+        return 0;
     }
 
     @Override
@@ -64,15 +77,8 @@ public class ConcreteScheduleDao implements Dao<Schedule> {
     }
 
     @Override
-    public ResultSet getRowCount() throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Schedule RIGHT OUTER JOIN Doctor D on Schedule.ID = D.schedule_id";
-        try {
-            PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql);
-            return preparedStatement.executeQuery();
-        } catch (SQLException e) {
-            System.err.println("getScheduleRowsNum()\n" + e.getMessage());
-            throw new SQLException();
-        }
+    public Integer getRowCount() throws SQLException {
+        return null;
     }
 
     public static ConcreteScheduleDao getInstance() {

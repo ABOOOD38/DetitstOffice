@@ -2,16 +2,18 @@ package models;
 
 import java.time.LocalDate;
 
-public record Doctor(Employee employee, PersonInfo personInfo, Schedule schedule) {
+public record Doctor(Integer ID, EmployeeInfo employeeInfo, PersonalInfo personalInfo, Schedule schedule) {
 
     public static DoctorBuilder getBuilder() {
         return new DoctorBuilder();
     }
 
     public static class DoctorBuilder {
-        private final Employee.EmployeeBuilder employeeBuilder = Employee.getBuilder();
-        private final PersonInfo.PersonInfoBuilder personInfoBuilder = PersonInfo.getBuilder();
+        private final EmployeeInfo.EmployeeBuilder employeeBuilder = EmployeeInfo.getBuilder();
+        private final PersonalInfo.PersonInfoBuilder personInfoBuilder = PersonalInfo.getBuilder();
         private final Schedule.ScheduleBuilder scheduleBuilder = Schedule.getBuilder();
+
+        private Integer ID;
 
         public DoctorBuilder withUserName(String userName) {
             employeeBuilder.withUserName(userName);
@@ -53,18 +55,24 @@ public record Doctor(Employee employee, PersonInfo personInfo, Schedule schedule
             return this;
         }
 
+        public DoctorBuilder withID(Integer ID) {
+            this.ID = ID;
+            return this;
+        }
+
         public Doctor build() {
-            return new Doctor(employeeBuilder.build(), personInfoBuilder.build(), scheduleBuilder.build());
+            return new Doctor(ID, employeeBuilder.build(), personInfoBuilder.build(), scheduleBuilder.build());
         }
     }
+
 
     @Override
     public String toString() {
         return "Doctor{" +
                 "Employee Info" +
-                employee.toString() + "\n" +
+                employeeInfo.toString() + "\n" +
                 "Personal Info" +
-                personInfo.toString() + "\n" +
+                personalInfo.toString() + "\n" +
                 "Schedule=" + schedule.toString() +
                 '}';
     }
