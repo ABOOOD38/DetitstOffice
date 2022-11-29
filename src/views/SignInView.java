@@ -1,6 +1,6 @@
 package views;
 
-import models.EmployeeInfo;
+import models.LoginInfo;
 import views.interfaces.InfoView;
 
 import javax.swing.*;
@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class SignInView extends JFrame implements InfoView<EmployeeInfo> {
+public class SignInView extends JFrame implements InfoView<LoginInfo> {
     private JTextField userNameTextFiled;
     private JPasswordField passwordTextFiled;
     private JButton signIn;
@@ -20,33 +20,40 @@ public class SignInView extends JFrame implements InfoView<EmployeeInfo> {
 
     @Override
     public void display() {
+        JPanel background = new JPanel(new BorderLayout());
 
+        //********************labels********************//
         JLabel userNameLabel = new JLabel("UserName");
         JLabel passwordLabel = new JLabel("Password");
         JPanel labelsPanel = new JPanel(new GridLayout(2, 1));
         labelsPanel.add(userNameLabel);
         labelsPanel.add(passwordLabel);
+        background.add(labelsPanel, BorderLayout.WEST);
 
-        signIn = new JButton("Sign In");
 
+        //******************TextFields*****************//
         userNameTextFiled = new JTextField(15);
         passwordTextFiled = new JPasswordField(15);
         JPanel textFieldsPanel = new JPanel(new GridLayout(2, 1));
         textFieldsPanel.add(userNameTextFiled);
         textFieldsPanel.add(passwordTextFiled);
-
-        JPanel background = new JPanel(new BorderLayout());
-        background.add(labelsPanel, BorderLayout.WEST);
         background.add(textFieldsPanel, BorderLayout.EAST);
+
+
+        //*******************Buttons*******************//
+        signIn = new JButton("Sign In");
         background.add(signIn, BorderLayout.SOUTH);
 
+
+        //*****************MetaData**********************//
+        setTitle("Sign in");
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         getContentPane().add(background, BorderLayout.CENTER);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pack();
-        setVisible(true);
-        setLocationRelativeTo(null);
         userNameTextFiled.requestFocus();
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     @Override
@@ -86,8 +93,8 @@ public class SignInView extends JFrame implements InfoView<EmployeeInfo> {
     }
 
     @Override
-    public EmployeeInfo getInfo() {
-        return EmployeeInfo.getBuilder().
+    public LoginInfo getInfo() {
+        return LoginInfo.getBuilder().
                 withUserName(getUserName()).
                 withPassword(getPassword()).
                 build();

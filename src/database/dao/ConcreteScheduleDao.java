@@ -10,6 +10,7 @@ import java.util.Collection;
 
 public class ConcreteScheduleDao implements ScheduleDao {
     private static final ConcreteScheduleDao INSTANCE = new ConcreteScheduleDao();
+    private final static Connection db_con = Database.getInstance().getConnection();
 
     private ConcreteScheduleDao() {
     }
@@ -20,7 +21,7 @@ public class ConcreteScheduleDao implements ScheduleDao {
 
         Collection<Schedule> schedules = new ArrayList<>();
 
-        try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = db_con.prepareStatement(sql)) {
             ResultSet result = preparedStatement.executeQuery();
 
             while (result.next()) {
@@ -41,7 +42,7 @@ public class ConcreteScheduleDao implements ScheduleDao {
     @Override
     public Integer delete(int id) throws SQLException {
         String sql = "DELETE FROM Schedule WHERE ID =" + id;
-        try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = db_con.prepareStatement(sql)) {
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.err.println("delete(id)\n" + e.getMessage());
@@ -53,7 +54,7 @@ public class ConcreteScheduleDao implements ScheduleDao {
     @Override
     public Integer insert(Schedule schedule) throws SQLException {
         String sql = "INSERT INTO Schedule(start_at, due_to) VALUES (?,?)";
-        try (PreparedStatement preparedStatement = Database.getInstance().getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = db_con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setDate(1, Date.valueOf(schedule.startAt()));
             preparedStatement.setDate(2, Date.valueOf(schedule.endAt()));
             preparedStatement.executeUpdate();

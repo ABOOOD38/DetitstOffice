@@ -9,8 +9,7 @@ import java.util.List;
 
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.SOUTH;
-import static utilities.ValidationMethods.isValidEmailAddress;
-import static utilities.ValidationMethods.isValidPhoneNumber;
+import static utilities.ValidationMethods.*;
 
 public class RegisterPatientView extends JFrame implements InfoView<Patient> {
     private static final int FRAME_WIDTH = 500;
@@ -25,16 +24,20 @@ public class RegisterPatientView extends JFrame implements InfoView<Patient> {
     @Override
     public void display() {
         JPanel backGround = new JPanel();
+
+        //********************buttons********************//
         register = new JButton("Register");
 
+        //*****************backgroundPanel***************//
         backGround.add(personInfoView.getLabelsPanel());
         backGround.add(personInfoView.getTextFieldsPanel());
 
+        //********************metaData******************//
+        setTitle("Patient Register");
+        setSize(FRAME_WIDTH, FRAME_HEIGHT);
         getContentPane().add(CENTER, backGround);
         getContentPane().add(SOUTH, register);
-        setTitle("Patient Register");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
         pack();
         requestFocus();
         setLocationRelativeTo(null);
@@ -43,25 +46,17 @@ public class RegisterPatientView extends JFrame implements InfoView<Patient> {
 
     @Override
     public void registerListeners(List<ActionListener> listeners) {
-        registerBtnListener(listeners.get(0));
+        if (listeners.size() == 1)
+            registerBtnListener(listeners.get(0));
     }
 
     private void registerBtnListener(ActionListener actionListener) {
         this.register.addActionListener(actionListener);
     }
 
-    public void displayMessage(String message) {
-        JOptionPane.showMessageDialog(this, message);
-    }
-
-    @Override
-    public JFrame getJFrame() {
-        return this;
-    }
-
     private String _getName() throws IllegalArgumentException {
         String name = personInfoView.getName();
-        if (name.length() >= 6) {
+        if (isValidLength(name)) {
             return name;
         } else {
             displayMessage("name must be at least 6 chars long");
@@ -92,10 +87,23 @@ public class RegisterPatientView extends JFrame implements InfoView<Patient> {
     @Override
     public Patient getInfo() throws IllegalArgumentException {
         try {
-            return Patient.getBuilder().withName(_getName()).withPhoneNumber(getPhoneNumber()).withEmail(getEmail()).build();
+            return Patient.getBuilder().
+                    withName(_getName()).
+                    withPhoneNumber(getPhoneNumber()).
+                    withEmail(getEmail()).
+                    build();
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException();
         }
+    }
+
+    public void displayMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    @Override
+    public JFrame getJFrame() {
+        return this;
     }
 
 }

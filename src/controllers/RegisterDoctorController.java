@@ -3,12 +3,13 @@ package controllers;
 import authentication.Auth;
 import database.dao.ConcreteDoctorDao;
 import models.Doctor;
-import org.jetbrains.annotations.Nullable;
+import views.HomeView;
 import views.interfaces.InfoView;
 
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class RegisterDoctorController {
     private InfoView<Doctor> doctorInfoView;
@@ -26,8 +27,9 @@ public class RegisterDoctorController {
 
     private ActionListener registerDoctorBtnListeners() {
         return actionEvent -> {
-            Doctor doctor = getDoctorInfo();
-            if (doctor != null) {
+            Optional<Doctor> optionalDoctor = getDoctorInfo();
+            if (optionalDoctor.isPresent()) {
+                Doctor doctor = optionalDoctor.get();
                 try {
                     switch (Auth.getInstance().authenticateDoctor(doctor)) {
                         case 0:
@@ -38,32 +40,27 @@ public class RegisterDoctorController {
                             doctorInfoView.displayMessage("choose another username");
                             break;
 
-                        case -1:
-                            doctorInfoView.displayMessage("Error Happened");
-                            break;
-
                         case 2:
-                            if (ConcreteDoctorDao.getInstance().insert(doctor) != 0) {
+                            if (ConcreteDoctorDao.getInstance().insert(doctor) == 1) {
                                 doctorInfoView.displayMessage("registration completed");
                                 clean();
                             } else
-                                doctorInfoView.displayMessage("Error Happened");
+                                doctorInfoView.displayMessage("Error Happened when inserting doctor");
                             break;
                     }
                 } catch (SQLException e) {
-                    doctorInfoView.displayMessage("Error Happened");
                     System.err.println(e.getMessage());
                 }
             }
         };
     }
 
-    private @Nullable Doctor getDoctorInfo() {
-        Doctor doctor = null;
+    private Optional<Doctor> getDoctorInfo() {
+        Optional<Doctor> doctor = Optional.empty();
         try {
-            doctor = doctorInfoView.getInfo();
+            doctor = Optional.of(doctorInfoView.getInfo());
         } catch (IllegalArgumentException ex) {
-            System.err.println("Invalid info");
+            System.err.println("errors: caught on the view");
         }
         return doctor;
     }
@@ -71,6 +68,6 @@ public class RegisterDoctorController {
     private void clean() {
         doctorInfoView.getJFrame().dispose();
         doctorInfoView = null;
-
+        HomeView.getInstance().setVisible(true);
     }
 }

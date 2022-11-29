@@ -9,31 +9,31 @@ import java.util.List;
 
 public class IndexView extends JFrame implements View {
     private JButton logIn;
-    private final static int FRAME_WIDTH = 350;
-    private final static int FRAME_HEIGHT = 350;
+    private final static int FRAME_WIDTH = 250;
+    private final static int FRAME_HEIGHT = 250;
 
     public IndexView() {
     }
 
     @Override
     public void display() {
-        setTitle("Dentist Office");
-
-        logIn = new JButton("LogIn");
         JPanel backGround = new JPanel();
 
-        JPanel buttonsPanel = new JPanel(new GridLayout(1, 1));
+        //***************Buttons*******************//
+        JPanel buttonsPanel = new JPanel();
+        logIn = new JButton("LogIn");
         buttonsPanel.add(logIn);
-
         backGround.add(buttonsPanel);
-        getContentPane().add(backGround, BorderLayout.CENTER);
+
+
+        //*****************MetaData*****************//
+        setTitle("Dentist Office");
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        getContentPane().add(backGround, BorderLayout.CENTER);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        pack();
-        setVisible(true);
-        requestFocus();
-        setLocationRelativeTo(null);
         logIn.requestFocus();
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     @Override
@@ -42,9 +42,8 @@ public class IndexView extends JFrame implements View {
             logInBtnListener(listeners.get(0));
     }
 
-    @Override
-    public JFrame getJFrame() {
-        return this;
+    private void logInBtnListener(ActionListener actionListener) {
+        logIn.addActionListener(actionListener);
     }
 
     @Override
@@ -52,8 +51,10 @@ public class IndexView extends JFrame implements View {
         JOptionPane.showMessageDialog(this, msg);
     }
 
-    private void logInBtnListener(ActionListener actionListener) {
-        logIn.addActionListener(actionListener);
+    @Override
+    public JFrame getJFrame() {
+        return this;
     }
+
 }
 

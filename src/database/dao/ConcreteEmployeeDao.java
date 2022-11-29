@@ -1,41 +1,39 @@
 package database.dao;
 
 import database.Database;
-import models.EmployeeInfo;
+import models.LoginInfo;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class ConcreteEmployeeDao implements Dao<EmployeeInfo> {
+public class ConcreteEmployeeDao implements Dao<LoginInfo> {
 
     private static final ConcreteEmployeeDao INSTANCE = new ConcreteEmployeeDao();
+    private static final Connection db_con = Database.getInstance().getConnection();
 
     private ConcreteEmployeeDao() {
 
     }
 
     @Override
-    public Collection<EmployeeInfo> getAll() throws SQLException {
+    public Collection<LoginInfo> getAll() throws SQLException {
         String sql = "SELECT user_name, password, role_id FROM Login";
 
-        Collection<EmployeeInfo> employeeInfos = new ArrayList<>();
+        Collection<LoginInfo> loginInfos = new ArrayList<>();
 
-        try (PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement statement = db_con.prepareStatement(sql)) {
             ResultSet result = statement.executeQuery();
 
             while (result.next()) {
-                EmployeeInfo empInfo = EmployeeInfo.getBuilder().
+                LoginInfo empInfo = LoginInfo.getBuilder().
                         withUserName(result.getString("user_name")).
                         withPassword(result.getString("password")).
                         withRoleID(result.getInt("role_id")).
                         build();
-                employeeInfos.add(empInfo);
+                loginInfos.add(empInfo);
             }
-            return employeeInfos;
+            return loginInfos;
         } catch (SQLException e) {
             System.err.println("Error happened getLoginsInfo()");
             throw new SQLException();
@@ -43,12 +41,12 @@ public class ConcreteEmployeeDao implements Dao<EmployeeInfo> {
     }
 
     @Override
-    public Integer insert(EmployeeInfo employeeInfo) throws SQLException {
+    public Integer insert(LoginInfo loginInfo) throws SQLException {
         String loginSql = "insert into Login (user_name, password, role_id) VALUES (?,?,?)";
         try {
-            PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(loginSql, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, employeeInfo.userName());
-            statement.setString(2, employeeInfo.password());
+            PreparedStatement statement = db_con.prepareStatement(loginSql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, loginInfo.userName());
+            statement.setString(2, loginInfo.password());
             statement.setInt(3, 2);
             statement.executeUpdate();
             ResultSet key = statement.getGeneratedKeys();
@@ -63,16 +61,22 @@ public class ConcreteEmployeeDao implements Dao<EmployeeInfo> {
 
     @Override
     public Integer delete(int id) throws SQLException {
+        String sql = "DELETE FROM Login WHERE ID =" + id;
+        try (PreparedStatement statement = db_con.prepareStatement(sql)) {
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+            throw new SQLException();
+        }
+    }
+
+    @Override
+    public Integer update(LoginInfo object) throws SQLException {
         return 0;
     }
 
     @Override
-    public Integer update(EmployeeInfo object) throws SQLException {
-        return 0;
-    }
-
-    @Override
-    public EmployeeInfo getById(int id) throws SQLException {
+    public LoginInfo getById(int id) throws SQLException {
         return null;
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 import static utilities.ValidationMethods.isValidDate;
 
-public class ScheduleController {
+public class ScheduleController {// TODO: 11/29/22
     private final TableInfoView<TableView> scheduleView;
 
     public ScheduleController(TableInfoView<TableView> scheduleView) {
@@ -58,12 +58,12 @@ public class ScheduleController {
                         setScheduleTable();
                     } else
                         scheduleView.displayMessage("please choose non empty start and end date");
-
                     scheduleView.resetScheduleID();
                 } catch (SQLException e) {
                     System.err.println(e.getMessage());
                 }
-            }
+            } else
+                scheduleView.displayMessage("Please select doctor_id from the table");
         };
     }
 

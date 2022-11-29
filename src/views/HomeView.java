@@ -8,48 +8,44 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class HomeView extends JFrame implements View {
-
     private static final int FRAME_WIDTH = 500;
     private static final int FRAME_HEIGHT = 500;
-
+    private static final HomeView INSTANCE = new HomeView();
     private JButton addDoctor;
     private JButton addPatient;
     private JButton addAppointments;
     private JButton addSchedule;
 
-    private static final HomeView INSTANCE = new HomeView();
-
     private HomeView() {
     }
 
-    public static HomeView getInstance() {
-        return INSTANCE;
-    }
 
     @Override
     public void display() {
         JPanel background = new JPanel();
 
-        JPanel buttonsPanel = new JPanel(new GridLayout(2, 1));
+        //**********************Buttons********************//
+        JPanel buttonsPanel = new JPanel(new GridLayout(2, 2));
         addDoctor = new JButton("Add Doctor");
         addPatient = new JButton("Add Patient");
-        addAppointments = new JButton("Add Appointments");
         addSchedule = new JButton("Add Schedule");
+        addAppointments = new JButton("Add Appointments");
 
         buttonsPanel.add(addDoctor);
         buttonsPanel.add(addPatient);
-        buttonsPanel.add(addAppointments);
         buttonsPanel.add(addSchedule);
+        buttonsPanel.add(addAppointments);
         background.add(buttonsPanel);
 
-        getContentPane().add(background, BorderLayout.CENTER);
+
+        //************************MetaData**********************//
         setTitle("Home");
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
-        pack();
+        getContentPane().add(background, BorderLayout.CENTER);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        pack();
         requestFocus();
         setLocationRelativeTo(null);
-
         setVisible(true);
     }
 
@@ -66,7 +62,6 @@ public class HomeView extends JFrame implements View {
 
     private void addScheduleBtnListener(ActionListener actionListener) {
         addSchedule.addActionListener(actionListener);
-
     }
 
     private void addDoctorBtnListener(ActionListener actionListener) {
@@ -89,5 +84,9 @@ public class HomeView extends JFrame implements View {
     @Override
     public JFrame getJFrame() {
         return this;
+    }
+
+    public static HomeView getInstance() {
+        return INSTANCE;
     }
 }

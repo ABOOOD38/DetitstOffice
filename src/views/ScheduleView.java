@@ -17,7 +17,7 @@ import java.util.List;
 public class ScheduleView extends JFrame implements TableInfoView<TableView> {
     private final static int FRAME_WIDTH = 400;
     private final static int FRAME_HEIGHT = 200;
-    private JButton showStar;
+    private JButton showStar;// TODO: 11/29/22
     private JButton showEnd;
     private JTextField startDateField;
     private JTextField endDateField;

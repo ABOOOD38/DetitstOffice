@@ -24,7 +24,6 @@ public class ValidationMethods {
     }
 
     public static boolean isValidPatient(Patient patient) throws SQLException {
-
         Collection<Patient> patients = ConcretePatientDao.getInstance().getAll();
         for (Patient _patient : patients)
             if (patient.personalInfo().equalsNameAndPhoneNum(_patient.personalInfo())) {
@@ -36,6 +35,10 @@ public class ValidationMethods {
     public static boolean isValidDate(Schedule schedule) {
         Period period = Period.between(schedule.startAt(), schedule.endAt());
         return period.getDays() >= 7;
+    }
+
+    public static boolean isValidLength(String str) {
+        return str.length() >= 6;
     }
 
 }

@@ -3,15 +3,15 @@ package database.dao;
 import database.Database;
 import models.Patient;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class ConcretePatientDao implements PatientDao {
 
     private static final ConcretePatientDao INSTANCE = new ConcretePatientDao();
+    private static final Connection db_con = Database.getInstance().getConnection();
 
     private ConcretePatientDao() {
 
@@ -19,13 +19,25 @@ public class ConcretePatientDao implements PatientDao {
 
     @Override
     public Collection<Patient> getAll() throws SQLException {
-        Database database = Database.getInstance();
         String sql = "SELECT * FROM Patient";
-        try {
-            PreparedStatement preparedStatement = database.getConnection().prepareStatement(sql);
-            //return preparedStatement.executeQuery();
-            return null;
-            // TODO: 11/26/22  
+        Collection<Patient> patients = new ArrayList<>();
+
+        try (PreparedStatement preparedStatement = db_con.prepareStatement(sql)) {
+            ResultSet result = preparedStatement.executeQuery();
+            while (result.next()) {
+                Patient patient = Patient.getBuilder().
+                        withPatientID(result.getInt("ID")).
+                        withName(result.getString("patient_name")).
+                        withEmail(result.getString("email")).
+                        withPhoneNumber(result.getString("phone_number")).
+                        withOwedBalance(BigDecimal.valueOf(result.getFloat("owed_balance"))).
+                        withPayedBalance(BigDecimal.valueOf(result.getFloat("total_payed_balance"))).
+                        withVisitID(result.getInt("visit_ID")).
+                        withAppointmentID(result.getInt("app_ID")).
+                        build();
+                patients.add(patient);
+            }
+            return patients;
         } catch (SQLException ex) {
             System.err.println("Error happened PatientDao getAll()");
             throw new SQLException();
@@ -34,10 +46,9 @@ public class ConcretePatientDao implements PatientDao {
 
     @Override
     public Integer insert(Patient patient) throws SQLException {
-        Database database = Database.getInstance();
         String sql = "INSERT INTO Patient(patient_name, email, phone_number, owed_balance, total_payed_balance) VALUES (?,?,?,?,?)";
 
-        try (PreparedStatement preparedStatement = database.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = db_con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, patient.personalInfo().name());
             preparedStatement.setString(2, patient.personalInfo().email());
             preparedStatement.setString(3, patient.personalInfo().phoneNumber());
@@ -52,17 +63,23 @@ public class ConcretePatientDao implements PatientDao {
     }
 
     @Override
-    public Integer delete(int id) {
+    public Integer delete(int id) throws SQLException {
+        String sql = "DELETE FROM Patient WHERE ID =" + id;
+        try (PreparedStatement statement = db_con.prepareStatement(sql)) {
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+            throw new SQLException();
+        }
+    }
+
+    @Override
+    public Integer update(Patient object) throws SQLException {
         return 0;
     }
 
     @Override
-    public Integer update(Patient object) {
-        return 0;
-    }
-
-    @Override
-    public Patient getById(int id) {
+    public Patient getById(int id) throws SQLException {
         return null;
     }
 

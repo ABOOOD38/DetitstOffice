@@ -1,34 +1,35 @@
 package models;
 
-public record EmployeeInfo(String userName, String password, Integer roleID) {
+public record LoginInfo(String userName, String password, Integer roleID) {
+    // TODO: 11/29/22 adapt the models to model the data base tables 
 
-    public static EmployeeBuilder getBuilder() {
-        return new EmployeeBuilder();
+    public static LoginInfoBuilder getBuilder() {
+        return new LoginInfoBuilder();
     }
 
-    public static class EmployeeBuilder {
+    public static class LoginInfoBuilder {
         private String userName;
         private String password;
         private Integer roleID;
 
 
-        public EmployeeBuilder withUserName(String userName) {
+        public LoginInfoBuilder withUserName(String userName) {
             this.userName = userName;
             return this;
         }
 
-        public EmployeeBuilder withPassword(String password) {
+        public LoginInfoBuilder withPassword(String password) {
             this.password = password;
             return this;
         }
 
-        public EmployeeBuilder withRoleID(Integer roleID) {
+        public LoginInfoBuilder withRoleID(Integer roleID) {
             this.roleID = roleID;
             return this;
         }
 
-        public EmployeeInfo build() {
-            return new EmployeeInfo(userName, password, roleID);
+        public LoginInfo build() {
+            return new LoginInfo(userName, password, roleID);
         }
     }
 
@@ -42,15 +43,15 @@ public record EmployeeInfo(String userName, String password, Integer roleID) {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || obj.getClass() != EmployeeInfo.class)
+        if (obj == null || obj.getClass() != LoginInfo.class)
             return false;
 
-        EmployeeInfo other = (EmployeeInfo) obj;
+        LoginInfo other = (LoginInfo) obj;
         return this.userName.equals(other.userName) && this.password.equals(other.password);
     }
 
     public boolean equalsUserName(Object obj) {
-        EmployeeInfo other = (EmployeeInfo) obj;
+        LoginInfo other = (LoginInfo) obj;
         return this.userName.equals(other.userName);
     }
 }

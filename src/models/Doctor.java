@@ -2,26 +2,26 @@ package models;
 
 import java.time.LocalDate;
 
-public record Doctor(Integer ID, EmployeeInfo employeeInfo, PersonalInfo personalInfo, Schedule schedule) {
+public record Doctor(Integer ID, LoginInfo loginInfo, PersonalInfo personalInfo, Schedule schedule) {
 
     public static DoctorBuilder getBuilder() {
         return new DoctorBuilder();
     }
 
     public static class DoctorBuilder {
-        private final EmployeeInfo.EmployeeBuilder employeeBuilder = EmployeeInfo.getBuilder();
+        private final LoginInfo.LoginInfoBuilder loginInfoBuilder = LoginInfo.getBuilder();
         private final PersonalInfo.PersonInfoBuilder personInfoBuilder = PersonalInfo.getBuilder();
         private final Schedule.ScheduleBuilder scheduleBuilder = Schedule.getBuilder();
 
         private Integer ID;
 
         public DoctorBuilder withUserName(String userName) {
-            employeeBuilder.withUserName(userName);
+            loginInfoBuilder.withUserName(userName);
             return this;
         }
 
         public DoctorBuilder withPassword(String password) {
-            employeeBuilder.withPassword(password);
+            loginInfoBuilder.withPassword(password);
             return this;
         }
 
@@ -61,7 +61,7 @@ public record Doctor(Integer ID, EmployeeInfo employeeInfo, PersonalInfo persona
         }
 
         public Doctor build() {
-            return new Doctor(ID, employeeBuilder.build(), personInfoBuilder.build(), scheduleBuilder.build());
+            return new Doctor(ID, loginInfoBuilder.build(), personInfoBuilder.build(), scheduleBuilder.build());
         }
     }
 
@@ -70,7 +70,7 @@ public record Doctor(Integer ID, EmployeeInfo employeeInfo, PersonalInfo persona
     public String toString() {
         return "Doctor{" +
                 "Employee Info" +
-                employeeInfo.toString() + "\n" +
+                loginInfo.toString() + "\n" +
                 "Personal Info" +
                 personalInfo.toString() + "\n" +
                 "Schedule=" + schedule.toString() +

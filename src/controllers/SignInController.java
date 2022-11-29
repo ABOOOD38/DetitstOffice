@@ -1,18 +1,18 @@
 package controllers;
 
 import authentication.Auth;
-import models.EmployeeInfo;
+import models.LoginInfo;
 import views.interfaces.InfoView;
-import org.jetbrains.annotations.Nullable;
 
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class SignInController {
-    private InfoView<EmployeeInfo> signInView;
+    private InfoView<LoginInfo> signInView;
 
-    public SignInController(InfoView<EmployeeInfo> signInView) {
+    public SignInController(InfoView<LoginInfo> signInView) {
         this.signInView = signInView;
 
         signInView.display();
@@ -25,11 +25,12 @@ public class SignInController {
 
     private ActionListener singInBtnListener() {
         return actionEvent -> {
-            EmployeeInfo employeeInfo = getEmployeeInfo();
+            Optional<LoginInfo> optionalEmpInfo = getEmployeeInfo();
 
-            if (employeeInfo != null) {
+            if (optionalEmpInfo.isPresent()) {
+                LoginInfo loginInfo = optionalEmpInfo.get();
                 try {
-                    switch (Auth.getInstance().authenticateEmployee(employeeInfo)) {
+                    switch (Auth.getInstance().authenticateEmployee(loginInfo)) {
                         case 1 -> {
                             new HomeController();
                             clean();
@@ -38,22 +39,21 @@ public class SignInController {
                             new DoctorController();
                             clean();
                         }
-                        case -1, 0 -> signInView.displayMessage("Wrong password or username, Please try again");
+                        case 0 -> signInView.displayMessage("Wrong password or username, Please try again");
                     }
                 } catch (SQLException e) {
                     System.err.println(e.getMessage());
-                    signInView.displayMessage("Some Error Happened, Please try again");
+                    signInView.displayMessage("Error Happened, please check your connection");
                 }
             }
         };
     }
 
-    private @Nullable EmployeeInfo getEmployeeInfo() {
-        EmployeeInfo employeeInfo = null;
+    private Optional<LoginInfo> getEmployeeInfo() {
+        Optional<LoginInfo> employeeInfo = Optional.empty();
         try {
-            employeeInfo = signInView.getInfo();
+            employeeInfo = Optional.of(signInView.getInfo());
         } catch (IllegalArgumentException e) {
-            System.err.println("empty");
             signInView.displayMessage("Please Enter username and password");
         }
         return employeeInfo;

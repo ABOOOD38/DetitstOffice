@@ -1,9 +1,10 @@
 package models;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-public record Patient(PersonalInfo personalInfo, BigDecimal owedBalance, BigDecimal payedBalance, List<Visit> visits) {
+public record Patient(Integer patient_ID, PersonalInfo personalInfo, BigDecimal owedBalance, BigDecimal payedBalance,
+                      Integer visits_ID,
+                      Integer appointment_ID) {
 
     public static PatientBuilder getBuilder() {
         return new PatientBuilder();
@@ -12,7 +13,9 @@ public record Patient(PersonalInfo personalInfo, BigDecimal owedBalance, BigDeci
     public static class PatientBuilder {
         private BigDecimal owedBalance = new BigDecimal(0);
         private BigDecimal payedBalance = new BigDecimal(0);
-        private List<Visit> visits;
+        private Integer visitsID;
+        private Integer appointment_ID;
+        private Integer Patient_ID;
         private final PersonalInfo.PersonInfoBuilder personInfoBuilder = PersonalInfo.getBuilder();
 
         public PatientBuilder withName(String name) {
@@ -40,13 +43,23 @@ public record Patient(PersonalInfo personalInfo, BigDecimal owedBalance, BigDeci
             return this;
         }
 
-        public PatientBuilder withVisits(List<Visit> visits) {
-            this.visits = visits;
+        public PatientBuilder withVisitID(Integer visitsID) {
+            this.visitsID = visitsID;
+            return this;
+        }
+
+        public PatientBuilder withAppointmentID(Integer appointment_ID) {
+            this.appointment_ID = appointment_ID;
+            return this;
+        }
+
+        public PatientBuilder withPatientID(Integer Patient_ID) {
+            this.Patient_ID = Patient_ID;
             return this;
         }
 
         public Patient build() {
-            return new Patient(personInfoBuilder.build(), owedBalance, payedBalance, visits);
+            return new Patient(Patient_ID, personInfoBuilder.build(), owedBalance, payedBalance, visitsID, appointment_ID);
         }
     }
 
@@ -56,7 +69,8 @@ public record Patient(PersonalInfo personalInfo, BigDecimal owedBalance, BigDeci
                 "Patient{" +
                 "owedBalance=" + owedBalance +
                 ", payedBalance=" + payedBalance +
-                ", visits=" + visits +
+                ", visits=" + visits_ID +
+                ", app_id=" + appointment_ID +
                 '}';
     }
 }

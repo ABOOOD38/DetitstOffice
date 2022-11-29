@@ -1,15 +1,15 @@
 package controllers;
 
 
-import models.Patient;
 import database.dao.ConcretePatientDao;
-import views.interfaces.InfoView;
-import org.jetbrains.annotations.Nullable;
+import models.Patient;
 import views.HomeView;
+import views.interfaces.InfoView;
 
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 import static utilities.ValidationMethods.isValidPatient;
 
@@ -29,30 +29,32 @@ public class RegisterPatientController {
 
     private ActionListener registerBtnListener() {
         return actionEvent -> {
-            Patient patient = getPatient();
-            if (patient != null) {
+            Optional<Patient> optionalPatient = getPatient();
+            if (optionalPatient.isPresent()) {
+                Patient patient = optionalPatient.get();
                 try {
                     if (isValidPatient(patient)) {
-                        ConcretePatientDao.getInstance().insert(patient);
-                        registerPatientView.displayMessage("Patient Inserted");
-                        clean();
+                        if (ConcretePatientDao.getInstance().insert(patient) != 0) {
+                            registerPatientView.displayMessage("Patient Inserted");
+                            clean();
+                        }
                     } else {
                         registerPatientView.displayMessage("Patient already registered");
                         clean();
                     }
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    System.err.println(e.getMessage());
                 }
             }
         };
     }
 
-    private @Nullable Patient getPatient() {
-        Patient patient = null;
+    private Optional<Patient> getPatient() {
+        Optional<Patient> patient = Optional.empty();
         try {
-            patient = registerPatientView.getInfo();
+            patient = Optional.of(registerPatientView.getInfo());
         } catch (IllegalArgumentException e) {
-            System.err.println("invalid info");
+            System.err.println("errors: caught on the view");
         }
         return patient;
     }
