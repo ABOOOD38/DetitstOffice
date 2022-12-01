@@ -1,13 +1,12 @@
 package models;
 
-public record LoginInfo(String userName, String password, Integer roleID) {
-    // TODO: 11/29/22 adapt the models to model the data base tables 
-
+public record LoginInfo(Integer ID, String userName, String password, Integer roleID) {
     public static LoginInfoBuilder getBuilder() {
         return new LoginInfoBuilder();
     }
 
     public static class LoginInfoBuilder {
+        private Integer ID;
         private String userName;
         private String password;
         private Integer roleID;
@@ -28,8 +27,13 @@ public record LoginInfo(String userName, String password, Integer roleID) {
             return this;
         }
 
+        public LoginInfoBuilder withLoginID(Integer ID) {
+            this.ID = ID;
+            return this;
+        }
+
         public LoginInfo build() {
-            return new LoginInfo(userName, password, roleID);
+            return new LoginInfo(ID, userName, password, roleID);
         }
     }
 

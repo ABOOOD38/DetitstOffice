@@ -23,8 +23,6 @@ public class ScheduleView extends JFrame implements TableInfoView<TableView> {
     private JTextField endDateField;
     private JList<Integer> idList;
     private int idVal;
-
-    private JButton add;
     private JButton remove;
     private JButton update;
     private JButton clear;
@@ -70,32 +68,13 @@ public class ScheduleView extends JFrame implements TableInfoView<TableView> {
         showEnd = new JButton("popup");
         buttons1.add(showStar);
         buttons1.add(showEnd);
-        //**********************INPUT_BUTTONS1*******************************//
 
-
-        //**********************INPUT_ID_LIST1*******************************//
-        idList = new JList<>();
-        DefaultListModel<Integer> listModel = new DefaultListModel<>();
-
-        idList.setSelectionMode(JList.VERTICAL);
-        idList.setModel(listModel);
-        idList.setVisibleRowCount(-1);
-        listModel.addAll(List.of(1, 2, 3, 4, 5, 6, 8, 9));
-        JScrollPane idListScroller = new JScrollPane(idList);
-
-        //**********************INPUT_ID_LIST1*******************************//
-        JPanel inputs1 = new JPanel(new GridLayout(1, 4));
+        //*****************************************INPUTS_1***********************************//
+        JPanel inputs1 = new JPanel(new GridLayout(1, 3));
         inputs1.add(labels1);
         inputs1.add(fields1);
         inputs1.add(buttons1);
-        JPanel s = new JPanel(new GridLayout(1, 2));
-        JLabel l = new JLabel("Select ID", SwingConstants.CENTER);
-        s.add(l);
-        s.add(idListScroller);
-        table1.add(s, BorderLayout.CENTER);
-
         table1.add(inputs1, BorderLayout.NORTH);
-        //*****************************************INPUTS_1***********************************//
 
 
         //****************SCHEDULE_TABLE***************//
@@ -106,21 +85,19 @@ public class ScheduleView extends JFrame implements TableInfoView<TableView> {
 
 
         //***************BUTTONS1***********************//
-        JPanel buttons_S = new JPanel(new GridLayout(1, 4));
-        add = new JButton("Add");
-        remove = new JButton("Remove");
+        JPanel buttons_S = new JPanel(new GridLayout(1, 3));
         update = new JButton("Update");
+        remove = new JButton("Remove");
         clear = new JButton("Clear");
-        buttons_S.add(add);
-        buttons_S.add(remove);
         buttons_S.add(update);
+        buttons_S.add(remove);
         buttons_S.add(clear);
         table1.add(buttons_S, BorderLayout.SOUTH);
         //***************BUTTONS1***********************//
 
 
         getContentPane().add(table1);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Doctor Schedules");
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         requestFocus();
@@ -138,13 +115,13 @@ public class ScheduleView extends JFrame implements TableInfoView<TableView> {
     public void registerListeners(List<ActionListener> listeners) {
         showStartListener();
         showEndListener();
-        idListListener();
         clearListener();
         scheduleSelectionListener();
 
-        addListener(listeners.get(0));
-        removeListener(listeners.get(1));
-        updateListener(listeners.get(2));
+        if (listeners.size() == 2) {
+            removeListener(listeners.get(0));
+            updateListener(listeners.get(1));
+        }
     }
 
     private void showStartListener() {
@@ -153,14 +130,6 @@ public class ScheduleView extends JFrame implements TableInfoView<TableView> {
 
     private void showEndListener() {
         showEnd.addActionListener(ae -> endDateField.setText(new DatePicker(this).setPickedDate()));
-    }
-
-    private void idListListener() {
-        idList.getSelectionModel().addListSelectionListener(ac -> idVal = idList.getSelectedValue());
-    }
-
-    private void addListener(ActionListener actionListener) {
-        add.addActionListener(actionListener);
     }
 
     private void removeListener(ActionListener actionListener) {
@@ -226,7 +195,10 @@ public class ScheduleView extends JFrame implements TableInfoView<TableView> {
         try {
             final LocalDate start = LocalDate.parse(startDateField.getText());
             final LocalDate end = LocalDate.parse(endDateField.getText());
-            return new Schedule(idVal, start, end);
+            return Schedule.getBuilder().
+                    withStartAt(start).
+                    withEndAt(end).
+                    build();
         } catch (DateTimeParseException e) {
             displayMessage("please choose start and end date");
             return null;
@@ -239,7 +211,7 @@ public class ScheduleView extends JFrame implements TableInfoView<TableView> {
     }
 
     @Override
-    public void resetScheduleID() {
+    public void resetSelectedID() {
         this.idVal = 0;
     }
 }

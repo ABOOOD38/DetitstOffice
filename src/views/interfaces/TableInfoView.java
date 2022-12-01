@@ -7,5 +7,5 @@ public interface TableInfoView<T> extends InfoView<T> {
     Schedule getSelectedSchedule();
 
     Integer getSelectedID();
-    void resetScheduleID();
+    void resetSelectedID();
 }

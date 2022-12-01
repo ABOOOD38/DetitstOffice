@@ -32,21 +32,15 @@ public class RegisterDoctorController {
                 Doctor doctor = optionalDoctor.get();
                 try {
                     switch (Auth.getInstance().authenticateDoctor(doctor)) {
-                        case 0:
-                            doctorInfoView.displayMessage("already registered");
-                            break;
-
-                        case 1:
-                            doctorInfoView.displayMessage("choose another username");
-                            break;
-
-                        case 2:
+                        case 0 -> doctorInfoView.displayMessage("already registered");
+                        case 1 -> doctorInfoView.displayMessage("choose another username");
+                        case 2 -> {
                             if (ConcreteDoctorDao.getInstance().insert(doctor) == 1) {
                                 doctorInfoView.displayMessage("registration completed");
                                 clean();
                             } else
                                 doctorInfoView.displayMessage("Error Happened when inserting doctor");
-                            break;
+                        }
                     }
                 } catch (SQLException e) {
                     System.err.println(e.getMessage());

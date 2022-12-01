@@ -46,7 +46,7 @@ public class ConcretePatientDao implements PatientDao {
 
     @Override
     public Integer insert(Patient patient) throws SQLException {
-        String sql = "INSERT INTO Patient(patient_name, email, phone_number, owed_balance, total_payed_balance) VALUES (?,?,?,?,?)";
+        String sql = "INSERT INTO Patient(name, email, phone_number, owed_balance, total_payed_balance) VALUES (?,?,?,?,?)";
 
         try (PreparedStatement preparedStatement = db_con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, patient.personalInfo().name());

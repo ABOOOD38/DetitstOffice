@@ -16,6 +16,8 @@ import static utilities.ValidationMethods.isValidDate;
 
 public class ScheduleController {// TODO: 11/29/22
     private final TableInfoView<TableView> scheduleView;
+    private static final ConcreteScheduleDao scheduleDB = ConcreteScheduleDao.getInstance();
+    private static final ConcreteDoctorDao doctorDB = ConcreteDoctorDao.getInstance();
 
     public ScheduleController(TableInfoView<TableView> scheduleView) {
         this.scheduleView = scheduleView;
@@ -26,19 +28,23 @@ public class ScheduleController {// TODO: 11/29/22
     }
 
     private List<ActionListener> listeners() {
-        return List.of(addListener(), removeListener(), updateListener());
+        return List.of(removeListener(), updateListener());
     }
 
-    private ActionListener addListener() {
+    private ActionListener removeListener() {
         return actionEvent -> {
-            Schedule schedule = getSelectedSchedule();
-            if (schedule != null && schedule.id() != 0) {
+            int doctorID = getSelectedDoctorId();
+            if (doctorID != -1) {
                 try {
-                    int fk = ConcreteScheduleDao.getInstance().insert(schedule);
-                    ConcreteDoctorDao.getInstance().update(schedule.id(), fk);
-                    scheduleView.displayMessage("added successfully");
-                    scheduleView.resetScheduleID();
-                    setScheduleTable();
+                    int doctor_schedule_fk = doctorDB.getById(doctorID).schedule().id();
+                    if (doctor_schedule_fk != 0) {
+                        if (scheduleDB.delete(doctor_schedule_fk) != 0) {
+                            showMessage("removed successfully");
+                            setScheduleTable();
+                        }
+                    } else
+                        showMessage("please choose non empty start and end date");
+                    scheduleView.resetSelectedID();
                 } catch (SQLException e) {
                     System.err.println(e.getMessage());
                 }
@@ -46,52 +52,82 @@ public class ScheduleController {// TODO: 11/29/22
         };
     }
 
-    private ActionListener removeListener() {
-        return actionEvent -> {
-            Integer scheduleID = scheduleView.getSelectedID();
-            if (scheduleID != 0) {
-                try {
-                    int fk = ConcreteDoctorDao.getInstance().getById(scheduleID).schedule().id();
-                    int ffk = ConcreteScheduleDao.getInstance().delete(fk);
-                    if (ffk != 0) {
-                        scheduleView.displayMessage("removed successfully");
-                        setScheduleTable();
-                    } else
-                        scheduleView.displayMessage("please choose non empty start and end date");
-                    scheduleView.resetScheduleID();
-                } catch (SQLException e) {
-                    System.err.println(e.getMessage());
-                }
-            } else
-                scheduleView.displayMessage("Please select doctor_id from the table");
-        };
-    }
-
     private ActionListener updateListener() {
-        return actionEvent -> {
-            System.out.println("Update");
-        };
+        return actionEvent -> updateOrInsertSchedule();
     }
 
     private @Nullable Schedule getSelectedSchedule() {
         Schedule schedule = scheduleView.getSelectedSchedule();
         if (schedule != null)
-            if (schedule.id() != 0)
+            if (getSelectedDoctorId() != -1)
                 if (isValidDate(schedule))
                     return schedule;
                 else
-                    scheduleView.displayMessage("Must be at lest one week between start_date and end_date ");
-            else
-                scheduleView.displayMessage("Please select doctor_id from the table");
+                    showMessage("Must be at lest one week between start_date and end_date ");
         return null;
     }
 
     private void setScheduleTable() {
         try {
-            scheduleView.setInfo(new DoctorScheduleTableInfo().getTableValues());
+            scheduleView.setInfo(DoctorScheduleTableInfo.getInstance().getTableValues());
         } catch (SQLException e) {
-            scheduleView.displayMessage("Error happened");
+            showMessage("Error happened");
             System.err.println(e.getMessage());
         }
+    }
+
+    private void insertSchedule(Schedule schedule) throws SQLException {
+        int fk = scheduleDB.insert(schedule);
+        doctorDB.update(getSelectedDoctorId(), fk);
+        showMessage("added successfully");
+        scheduleView.resetSelectedID();
+        setScheduleTable();
+    }
+
+    private void updateSchedule(Schedule schedule, int id) throws SQLException {
+        schedule = updateScheduleObjID(schedule, id);
+        if (scheduleDB.update(schedule) != 0) {
+            setScheduleTable();
+            showMessage("Updated successfully");
+        }
+    }
+
+    private void updateOrInsertSchedule() {
+        Schedule schedule = getSelectedSchedule();
+        if (schedule != null) {
+            int doctorID = getSelectedDoctorId();
+            if (doctorID == -1) return;
+
+            try {
+                int doctor_schedule_fk = doctorDB.getById(doctorID).schedule().id();
+                if (doctor_schedule_fk == 0)
+                    insertSchedule(schedule);
+                else
+                    updateSchedule(schedule, doctor_schedule_fk);
+            } catch (SQLException e) {
+                showMessage("Error happened");
+                System.err.println(e.getMessage());
+            }
+        }
+    }
+
+    private int getSelectedDoctorId() {
+        int id = scheduleView.getSelectedID();
+        if (id != 0) {
+            return id;
+        }
+        showMessage("Please select ID (doctor id) from the table");
+        return -1;
+    }
+
+    private Schedule updateScheduleObjID(Schedule schedule, int id) {
+        return Schedule.getBuilder().
+                withStartAt(schedule.startAt()).
+                withEndAt(schedule.endAt()).
+                withID(id).build();
+    }
+
+    private void showMessage(String message) {
+        scheduleView.displayMessage(message);
     }
 }

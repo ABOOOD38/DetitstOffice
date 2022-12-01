@@ -2,7 +2,7 @@ package models;
 
 import java.time.LocalDate;
 
-public record Doctor(Integer ID, LoginInfo loginInfo, PersonalInfo personalInfo, Schedule schedule) {
+public record Doctor(Integer ID, PersonalInfo personalInfo, LoginInfo loginInfo, Schedule schedule) {
 
     public static DoctorBuilder getBuilder() {
         return new DoctorBuilder();
@@ -61,7 +61,7 @@ public record Doctor(Integer ID, LoginInfo loginInfo, PersonalInfo personalInfo,
         }
 
         public Doctor build() {
-            return new Doctor(ID, loginInfoBuilder.build(), personInfoBuilder.build(), scheduleBuilder.build());
+            return new Doctor(ID, personInfoBuilder.build(), loginInfoBuilder.build(), scheduleBuilder.build());
         }
     }
 

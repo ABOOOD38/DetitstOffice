@@ -17,7 +17,7 @@ public class ConcreteScheduleDao implements ScheduleDao {
 
     @Override
     public Collection<Schedule> getAll() throws SQLException {
-        String sql = "SELECT ID, start_at, due_to FROM Schedule";
+        String sql = "SELECT ID, start_at, end_at FROM Schedule";
 
         Collection<Schedule> schedules = new ArrayList<>();
 
@@ -53,7 +53,7 @@ public class ConcreteScheduleDao implements ScheduleDao {
     // 0 if not inserted
     @Override
     public Integer insert(Schedule schedule) throws SQLException {
-        String sql = "INSERT INTO Schedule(start_at, due_to) VALUES (?,?)";
+        String sql = "INSERT INTO Schedule(start_at, end_at) VALUES (?,?)";
         try (PreparedStatement preparedStatement = db_con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setDate(1, Date.valueOf(schedule.startAt()));
             preparedStatement.setDate(2, Date.valueOf(schedule.endAt()));
@@ -68,8 +68,17 @@ public class ConcreteScheduleDao implements ScheduleDao {
     }
 
     @Override
-    public Integer update(Schedule object) throws SQLException {
-        return 0;
+    public Integer update(Schedule schedule) throws SQLException {
+        String sql = "UPDATE Schedule SET start_at = ?, end_at = ? WHERE ID = ?";
+        try (PreparedStatement statement = db_con.prepareStatement(sql)) {
+            statement.setDate(1, Date.valueOf(schedule.startAt()));
+            statement.setDate(2, Date.valueOf(schedule.endAt()));
+            statement.setInt(3, schedule.id());
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+            throw new SQLException();
+        }
     }
 
     @Override

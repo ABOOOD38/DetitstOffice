@@ -27,7 +27,7 @@ public class ConcreteDoctorDao implements DoctorDao<Doctor> {
 
     @Override
     public Integer insert(Doctor doctor) throws SQLException {
-        String insertDoctorSql = "insert into Doctor (doctor_name, email, phone_number,login_id) VALUES (?,?,?,?)";
+        String insertDoctorSql = "insert into Doctor (name, email, phone_number,login_id) VALUES (?,?,?,?)";
 
         Integer key = ConcreteEmployeeDao.getInstance().insert(doctor.loginInfo());
         try (PreparedStatement statement = db_con.prepareStatement(insertDoctorSql)) {
@@ -47,7 +47,7 @@ public class ConcreteDoctorDao implements DoctorDao<Doctor> {
 
     @Override
     public Integer delete(int id) throws SQLException {
-        String sql = "DELETE FROM Doctor WHERE doctor_id =" + id;
+        String sql = "DELETE FROM Doctor WHERE ID =" + id;
         try (PreparedStatement statement = db_con.prepareStatement(sql)) {
             return statement.executeUpdate();
         } catch (SQLException e) {
@@ -63,12 +63,12 @@ public class ConcreteDoctorDao implements DoctorDao<Doctor> {
 
     @Override
     public Doctor getById(int id) throws SQLException {
-        String sql = "SELECT doctor_name, email, phone_number, schedule_id, login_id FROM Doctor WHERE doctor_id =" + id;
+        String sql = "SELECT name, email, phone_number, schedule_id, login_id FROM Doctor WHERE ID =" + id;
         try (PreparedStatement preparedStatement = db_con.prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
             return Doctor.getBuilder().
-                    withName(resultSet.getString("doctor_name")).
+                    withName(resultSet.getString("name")).
                     withEmail(resultSet.getString("email")).
                     withPhoneNumber(resultSet.getString("phone_number")).
                     withScheduleID(resultSet.getInt("schedule_id"))
@@ -86,14 +86,14 @@ public class ConcreteDoctorDao implements DoctorDao<Doctor> {
 
     @Override
     public Collection<Doctor> getDoctorJoinLogin() throws SQLException {
-        String sql = "select doctor_name, email, phone_number, user_name, password FROM Doctor INNER JOIN Login ON Doctor.login_id = Login.ID";
+        String sql = "select name, email, phone_number, user_name, password FROM Doctor INNER JOIN Login ON Doctor.login_id = Login.ID";
         Collection<Doctor> doctors = new ArrayList<>();
 
         try (PreparedStatement statement = db_con.prepareStatement(sql)) {
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 Doctor doctor = Doctor.getBuilder().
-                        withName(result.getString("doctor_name")).
+                        withName(result.getString("name")).
                         withEmail(result.getString("email")).
                         withPhoneNumber(result.getString("phone_number")).
                         withUserName(result.getString("user_name")).
@@ -111,7 +111,7 @@ public class ConcreteDoctorDao implements DoctorDao<Doctor> {
 
     @Override
     public Collection<Doctor> getDoctorJoinSchedule() throws SQLException {
-        String sql = "SELECT Doctor.doctor_id, doctor_name, email, phone_number, schedule_id, start_at, due_to FROM Doctor LEFT OUTER JOIN  Schedule ON Doctor.schedule_id = Schedule.ID";
+        String sql = "SELECT Doctor.ID, name, email, phone_number, schedule_id, start_at, end_at FROM Doctor LEFT OUTER JOIN  Schedule ON Doctor.schedule_id = Schedule.ID";
 
         Collection<Doctor> doctors = new ArrayList<>();
         try (PreparedStatement preparedStatement = db_con.prepareStatement(sql)) {
@@ -119,13 +119,13 @@ public class ConcreteDoctorDao implements DoctorDao<Doctor> {
 
             while (result.next()) {
                 Doctor doctor = Doctor.getBuilder().
-                        withID(result.getInt("doctor_id")).
-                        withName(result.getString("doctor_name")).
+                        withID(result.getInt("ID")).
+                        withName(result.getString("name")).
                         withEmail(result.getString("email")).
                         withPhoneNumber(result.getString("phone_number")).
                         withScheduleID(result.getInt("schedule_id")).
                         withStartAt(LocalDate.parse(result.getDate("start_at").toString())).
-                        withEndAt(LocalDate.parse(result.getDate("due_to").toString())).
+                        withEndAt(LocalDate.parse(result.getDate("end_at").toString())).
                         build();
 
                 doctors.add(doctor);
@@ -139,7 +139,7 @@ public class ConcreteDoctorDao implements DoctorDao<Doctor> {
 
     @Override
     public Integer update(Integer id, Integer fk) throws SQLException {
-        String sql = "UPDATE Doctor SET schedule_id = " + fk + " WHERE doctor_id = " + id;
+        String sql = "UPDATE Doctor SET schedule_id = " + fk + " WHERE ID = " + id;
         try (PreparedStatement preparedStatement = db_con.prepareStatement(sql)) {
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
