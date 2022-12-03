@@ -1,8 +1,9 @@
 package models;
 
+import java.sql.Time;
 import java.time.LocalDate;
 
-public record Schedule(int id, LocalDate startAt, LocalDate endAt) {
+public record Schedule(int id, LocalDate startAt, LocalDate endAt, String days, Time startTime, Time endTime) {
     public static ScheduleBuilder getBuilder() {
         return new ScheduleBuilder();
     }
@@ -11,6 +12,10 @@ public record Schedule(int id, LocalDate startAt, LocalDate endAt) {
         private int id;
         private LocalDate startAt;
         private LocalDate endAt;
+        private String days;
+        private Time startTime;
+        private Time endTime;
+
 
         public ScheduleBuilder withID(int id) {
             this.id = id;
@@ -27,8 +32,23 @@ public record Schedule(int id, LocalDate startAt, LocalDate endAt) {
             return this;
         }
 
+        public ScheduleBuilder withDays(String days) {
+            this.days = days;
+            return this;
+        }
+
+        public ScheduleBuilder withStartTime(Time startTime) {
+            this.startTime = startTime;
+            return this;
+        }
+
+        public ScheduleBuilder withEndTime(Time endTime) {
+            this.endTime = endTime;
+            return this;
+        }
+
         public Schedule build() {
-            return new Schedule(id, startAt, endAt);
+            return new Schedule(id, startAt, endAt, days, startTime, endTime);
         }
     }
 

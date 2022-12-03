@@ -4,13 +4,11 @@ import database.Database;
 import models.Schedule;
 import models.TableView;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DoctorScheduleTableInfo implements TableInfo<Schedule> {
     private static final DoctorScheduleTableInfo INSTANCE = new DoctorScheduleTableInfo();
+    private static final Connection dbCon = Database.getInstance().getConnection();
 
     private DoctorScheduleTableInfo() {
 
@@ -43,7 +41,7 @@ public class DoctorScheduleTableInfo implements TableInfo<Schedule> {
     @Override
     public Integer getRowsCount() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Doctor LEFT OUTER JOIN  Schedule ON Doctor.schedule_id = Schedule.ID";
-        try (PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement statement = dbCon.prepareStatement(sql)) {
             ResultSet result = statement.executeQuery();
             if (result.next())
                 return result.getInt(1);
@@ -55,8 +53,8 @@ public class DoctorScheduleTableInfo implements TableInfo<Schedule> {
 
     @Override
     public TableView getTableValues() throws SQLException {
-        String sql = "SELECT Doctor.ID, name, email, phone_number, schedule_id, start_at, end_at FROM Doctor LEFT OUTER JOIN  Schedule ON Doctor.schedule_id = Schedule.ID";
-        try (PreparedStatement statement = Database.getInstance().getConnection().prepareStatement(sql)) {
+        String sql = "SELECT Doctor.ID, name, email, phone_number, start_at, end_at, days, start_time, end_time FROM Doctor LEFT OUTER JOIN  Schedule ON Doctor.schedule_id = Schedule.ID";
+        try (PreparedStatement statement = dbCon.prepareStatement(sql)) {
             ResultSet result = statement.executeQuery();
 
             String[] colsNames = getColsNames(result);

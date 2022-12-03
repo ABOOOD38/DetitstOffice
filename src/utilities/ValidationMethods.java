@@ -5,6 +5,7 @@ import models.Patient;
 import models.Schedule;
 
 import java.sql.SQLException;
+import java.sql.Time;
 import java.time.Period;
 import java.util.Collection;
 import java.util.regex.Matcher;
@@ -35,6 +36,20 @@ public class ValidationMethods {
     public static boolean isValidDate(Schedule schedule) {
         Period period = Period.between(schedule.startAt(), schedule.endAt());
         return period.getDays() >= 7;
+    }
+
+    //1 if start same end, 2 if start > end, 3 good.
+    public static int isValidTime(Time startTime, Time endTime) {
+        long diffMs = endTime.getTime() - startTime.getTime();
+        long minutes = diffMs / 1000 / 60;
+        System.err.println(minutes);
+
+        if (minutes == 0)
+            return 1;
+        if (minutes < 0)
+            return 2;
+
+        return 3;
     }
 
     public static boolean isValidLength(String str) {

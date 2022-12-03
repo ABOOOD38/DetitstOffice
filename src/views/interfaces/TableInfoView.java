@@ -1,11 +1,9 @@
 package views.interfaces;
 
-import models.Schedule;
-
-public interface TableInfoView<T> extends InfoView<T> {
-    void setInfo(T info);
-    Schedule getSelectedSchedule();
+public interface TableInfoView<T, E> extends InfoView<E> {
+    void setTableInfo(T info);
 
     Integer getSelectedID();
+
     void resetSelectedID();
 }

@@ -15,11 +15,11 @@ import java.util.List;
 import static utilities.ValidationMethods.isValidDate;
 
 public class ScheduleController {// TODO: 11/29/22
-    private final TableInfoView<TableView> scheduleView;
+    private final TableInfoView<TableView, Schedule> scheduleView;
     private static final ConcreteScheduleDao scheduleDB = ConcreteScheduleDao.getInstance();
     private static final ConcreteDoctorDao doctorDB = ConcreteDoctorDao.getInstance();
 
-    public ScheduleController(TableInfoView<TableView> scheduleView) {
+    public ScheduleController(TableInfoView<TableView, Schedule> scheduleView) {
         this.scheduleView = scheduleView;
 
         setScheduleTable();
@@ -57,7 +57,7 @@ public class ScheduleController {// TODO: 11/29/22
     }
 
     private @Nullable Schedule getSelectedSchedule() {
-        Schedule schedule = scheduleView.getSelectedSchedule();
+        Schedule schedule = scheduleView.getInfo();
         if (schedule != null)
             if (getSelectedDoctorId() != -1)
                 if (isValidDate(schedule))
@@ -69,7 +69,7 @@ public class ScheduleController {// TODO: 11/29/22
 
     private void setScheduleTable() {
         try {
-            scheduleView.setInfo(DoctorScheduleTableInfo.getInstance().getTableValues());
+            scheduleView.setTableInfo(DoctorScheduleTableInfo.getInstance().getTableValues());
         } catch (SQLException e) {
             showMessage("Error happened");
             System.err.println(e.getMessage());
